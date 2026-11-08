@@ -1,12 +1,13 @@
 <!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ATOM</title>
 <script>
 // anciennes pages d'atomdz.com (WordPress) -> la bonne partie du nouveau site
-var p = location.pathname.toLowerCase(), to = '/';
-if (/packages|atom-pro-max|subscription|abonnement/.test(p)) to = '/#abonnements';
-else if (/atom-s3|atom-s2|remote|product|shop|cart|checkout/.test(p)) to = '/#produits';
-else if (/help|faq/.test(p)) to = '/#faq';
-else if (/contact/.test(p)) to = '/#magasins';
+var base = /github\.io$/.test(location.hostname) ? '/myatomdz/' : '/';
+var p = location.pathname.toLowerCase(), to = base;
+if (/packages|atom-pro-max|subscription|abonnement/.test(p)) to = base + '#abonnements';
+else if (/atom-s3|atom-s2|remote|product|shop|cart|checkout/.test(p)) to = base + '#produits';
+else if (/help|faq/.test(p)) to = base + '#faq';
+else if (/contact/.test(p)) to = base + '#magasins';
 location.replace(to + location.search);
 </script>
 <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b1324;color:#eef3ff;font:16px system-ui}a{color:#75e2b6}</style></head>
-<body><p><a href="/">ATOM ←</a></p></body></html>
+<body><p><a href="./">ATOM ←</a></p></body></html>
