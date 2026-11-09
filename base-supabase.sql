@@ -155,3 +155,14 @@ grant execute on function panel_delete(text,uuid) to anon;
 -- ---------- TON CODE DU PANEL : remplace 1234 par ton code secret à 4 chiffres ----------
 insert into panel_settings (id, code_hash) values (1, extensions.crypt('1234', extensions.gen_salt('bf')))
 on conflict (id) do update set code_hash = excluded.code_hash;
+
+-- ---------- v9.30 : changer le code depuis le panel (bouton 🔑) ----------
+create or replace function panel_change_code(p_code text, p_new text) returns boolean
+language plpgsql security definer set search_path = public, extensions as $$
+begin
+  if not panel_check(p_code) then return false; end if;
+  if coalesce(p_new,'') !~ '^[0-9]{6,8}$' then return false; end if;
+  update panel_settings set code_hash = crypt(p_new, gen_salt('bf')) where id = 1;
+  return true;
+end $$;
+grant execute on function panel_change_code(text,text) to anon;
