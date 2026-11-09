@@ -161,7 +161,7 @@ create or replace function panel_change_code(p_code text, p_new text) returns bo
 language plpgsql security definer set search_path = public, extensions as $$
 begin
   if not panel_check(p_code) then return false; end if;
-  if coalesce(p_new,'') !~ '^[0-9]{6,8}$' then return false; end if;
+  if coalesce(p_new,'') !~ '^[0-9]{6}$' then return false; end if;
   update panel_settings set code_hash = crypt(p_new, gen_salt('bf')) where id = 1;
   return true;
 end $$;
