@@ -675,10 +675,10 @@ html[data-theme="light"] .s2-table th,html[data-theme="light"] .s2-table td{bord
 
 /* ===== v9.51 : 3D qui s'ouvre en 3 fois au scroll, puis la page continue ===== */
 html{scroll-snap-type:y proximity}
-.in-pin,.in-pin[id]{height:calc(min(86svh,760px) + 210svh)!important}
+.in-pin,.in-pin[id]{height:calc(min(86svh,760px) + 90svh)!important}
 .in-sticky{position:sticky!important;top:calc(68px + env(safe-area-inset-top,0px))!important}
 .in-snap{position:absolute;left:0;width:1px;height:1px;scroll-snap-align:start;scroll-margin-top:calc(68px + env(safe-area-inset-top,0px));pointer-events:none}
-@media (max-width:600px){.in-pin,.in-pin[id]{height:calc(min(78svh,640px) + 210svh)!important}}
+@media (max-width:600px){.in-pin,.in-pin[id]{height:calc(min(78svh,640px) + 90svh)!important}}
 .in-hint .in-mouse{display:block!important}
 
 /* ===== v9.51 : liens du bas bien visibles ===== */
@@ -1002,7 +1002,7 @@ html[data-theme="light"] .ce input,html[data-theme="light"] .ce textarea,html[da
   <!-- PRODUCTS -->
   <!-- INSIDE 3D : s'ouvre pendant qu'on descend -->
   <section class="inside" id="inside">
-    <div class="in-pin" id="insidePin"><i class="in-snap" style="top:0"></i><i class="in-snap" style="top:70svh"></i><i class="in-snap" style="top:140svh"></i><i class="in-snap" style="top:210svh"></i>
+    <div class="in-pin" id="insidePin"><i class="in-snap" style="top:0"></i><i class="in-snap" style="top:30svh"></i><i class="in-snap" style="top:60svh"></i><i class="in-snap" style="top:90svh"></i>
       <div class="in-sticky">
         <div class="in-stage" id="insideStage">
           <div class="in-head">
