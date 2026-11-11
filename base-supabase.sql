@@ -336,3 +336,9 @@ update site_catalog_eu set slug='inferno', descr='8K · Amlogic S905X3 · 4 Go D
 insert into site_catalog_eu (key, slug, name, price_eur, sort_order, active, descr, specs, imgs) values
   ('eu_telecommande','telecommande','Télécommande ATOM',0,6,false,'Télécommande Bluetooth de rechange','["Bluetooth","Touches Netflix, YouTube, Prime Video","Compatible ATOM S3 et S2"]','["img/remote-1.jpg","img/remote-2.jpg","img/remote-3.jpg"]')
 on conflict (key) do nothing;
+
+-- v9.48 : paiement en ligne SumUp (fonction sumup-pay)
+alter table site_orders add column if not exists sumup_id text;
+alter table site_orders add column if not exists sumup_url text;
+alter table site_orders add column if not exists paid_at timestamptz;
+create index if not exists site_orders_sumup on site_orders (sumup_id);

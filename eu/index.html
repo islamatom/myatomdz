@@ -71,7 +71,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}f
 <header class="hdr"><div class="logo">AT<i>✻</i>M</div><button class="ib" id="th" type="button" aria-label="Jour / nuit">☀️</button></header>
 <main class="wrap">
   <div class="home" id="home">
-  <section class="hero"><h1>Boîtiers <em>Android TV 4K</em></h1><p>Choisissez votre boîtier, remplissez le formulaire : on vous envoie le lien de paiement sécurisé SumUp sur WhatsApp.</p></section>
+  <section class="hero"><h1>Boîtiers <em>Android TV 4K</em></h1><p>Choisissez votre boîtier, remplissez le formulaire et payez en ligne par carte, en toute sécurité avec SumUp.</p></section>
   <div class="show" id="show"></div>
   <h2 style="margin:20px 0 0">Choisissez votre boîtier</h2>
   <div class="grid" id="grid"></div>
@@ -93,8 +93,8 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}f
     <label class="f"><span>Adresse (rue et numéro) <i>*</i></span><input name="address" autocomplete="street-address" required maxlength="150"></label>
     <div class="sum"><div><span id="sl">—</span><span id="sp">—</span></div><div><span>Livraison</span><span id="ss">—</span></div><div class="tot"><span>Total <small class="tvac">TVA comprise</small></span><b id="st">—</b></div></div>
     <p class="err" id="err" hidden></p>
-    <button class="go" id="go" type="submit">Commander</button>
-    <p class="pay">🧾 Tous les prix sont TVA comprise (TVAC). 🔒 Aucune carte demandée ici. Vous payez ensuite par le lien SumUp envoyé sur WhatsApp.</p>
+    <button class="go" id="go" type="submit">Commander et payer</button>
+    <p class="pay">🔒 Paiement sécurisé par carte bancaire sur la page SumUp. Tous les prix sont TVA comprise.</p>
   </form>
   <div class="box done" id="done" hidden></div>
   <section class="sug"><h2>Vous aimerez aussi</h2><div class="sg" id="sg"></div></section>
@@ -182,14 +182,39 @@ $('f').addEventListener('submit', async e => {
       const r = await fetch(`${CONFIG.url}/rest/v1/rpc/submit_eu_order`, { method:'POST', headers:{ 'Content-Type':'application/json', apikey: CONFIG.key, Authorization:`Bearer ${CONFIG.key}` }, body: JSON.stringify({ p_name: v('name'), p_phone: phone, p_country: v('country'), p_city: v('city'), p_zip: v('zip'), p_address: v('address'), p_items: [{ key: sel, qty }], p_ship: SHIP || 0, p_email: v('email') || null }) });
       if (!r.ok) throw new Error(); no = (await r.json()).order_no;
     }
+    // paiement en ligne SumUp : le client part directement sur la page de paiement
+    if (no !== 'EU-TEST') {
+      btn.textContent = 'Ouverture du paiement…';
+      try { localStorage.setItem('atom-eu-cmd', JSON.stringify({ no, phone })); } catch (x) {}
+      const pay = await payFn({ order_no: no, phone }).catch(() => null);
+      if (pay && pay.url) { location.href = pay.url; return; }
+    }
     const msg = `Bonjour ATOM 🇪🇺\nCommande ${no}\n${qty} × ${p.name} — ${eurf(p.price * qty)}\n${v('name')} · ${v('city')}, ${v('country')}\nMerci de m'envoyer le lien de paiement SumUp.`;
     f.hidden = true; const d = $('done'); d.hidden = false;
     d.innerHTML = `<div class="big">✅</div><h2>Commande reçue !</h2><div class="no">${no}</div><p>On vous envoie le <b>lien de paiement SumUp</b> sur WhatsApp. Dès le paiement, votre boîtier part.</p><a class="wa" href="https://wa.me/${WA}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">💬 Recevoir le lien sur WhatsApp</a>`;
     d.scrollIntoView({ behavior:'smooth' });
   } catch (x) { err.textContent = 'Commande non envoyée. Vérifiez internet ou écrivez-nous sur WhatsApp.'; err.hidden = false; }
-  btn.disabled = false; btn.textContent = 'Commander';
+  btn.disabled = false; btn.textContent = 'Commander et payer';
 });
 route();
+async function payFn(body){
+  const r = await fetch(`${CONFIG.url}/functions/v1/sumup-pay`, { method:'POST', headers:{ 'Content-Type':'application/json', apikey: CONFIG.key, Authorization:`Bearer ${CONFIG.key}` }, body: JSON.stringify(body) });
+  return r.ok ? r.json() : null;
+}
+// retour de la page de paiement SumUp
+(async () => {
+  const no = new URLSearchParams(location.search).get('cmd'); if (!no) return;
+  let s = null; try { s = JSON.parse(localStorage.getItem('atom-eu-cmd') || 'null'); } catch (x) {}
+  const box = document.createElement('div'); box.className = 'box done';
+  box.innerHTML = '<div class="big">⏳</div><h2>Vérification du paiement…</h2>';
+  $('home').prepend(box); box.scrollIntoView();
+  const wa = `https://wa.me/${WA}?text=${encodeURIComponent('Bonjour ATOM 🇪🇺\nCommande ' + no + ' — question sur mon paiement.')}`;
+  let res = null;
+  for (let i = 0; i < 4 && !(res && res.paid); i++) { if (s && s.no === no) res = await payFn({ action:'check', order_no: no, phone: s.phone }).catch(() => null); if (!(res && res.paid)) await new Promise(r => setTimeout(r, 2000)); }
+  if (res && res.paid) box.innerHTML = `<div class="big">✅</div><h2>Paiement reçu, merci !</h2><div class="no">${no}</div><p>Votre commande est confirmée. On prépare votre colis et on vous écrit sur WhatsApp pour le suivi.</p><a class="wa" href="${wa}" target="_blank" rel="noopener">💬 Nous écrire sur WhatsApp</a>`;
+  else box.innerHTML = `<div class="big">💳</div><h2>Paiement pas encore reçu</h2><div class="no">${no}</div><p>Votre commande est bien enregistrée. Si vous avez fermé la page de paiement, vous pouvez réessayer.</p>${res && res.url ? `<a class="go" style="display:block;text-align:center;text-decoration:none" href="${res.url}">💳 Payer maintenant</a>` : ''}<a class="wa" href="${wa}" target="_blank" rel="noopener">💬 Besoin d'aide ? WhatsApp</a>`;
+  history.replaceState(null, '', location.pathname);
+})();
 // catalogue géré depuis le panel (Supabase) — la liste ci-dessus sert de secours
 (async () => {
   if (!/^https?:$/.test(location.protocol)) return;
