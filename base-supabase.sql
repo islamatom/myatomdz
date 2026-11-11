@@ -342,3 +342,91 @@ alter table site_orders add column if not exists sumup_id text;
 alter table site_orders add column if not exists sumup_url text;
 alter table site_orders add column if not exists paid_at timestamptz;
 create index if not exists site_orders_sumup on site_orders (sumup_id);
+-- ---------- v9.51 : code de Salima (commandes Algérie seulement) + code patron ----------
+alter table panel_settings add column if not exists staff_hash text;
+
+create or replace function panel_role(p_code text) returns text
+language plpgsql security definer set search_path = public, extensions as $$
+declare bad int; r text;
+begin
+  select count(*) into bad from panel_attempts where not panel_attempts.ok and at > now() - interval '15 minutes';
+  if bad >= 10 then return null; end if;   -- trop d'essais : bloqué 15 minutes
+  select case when code_hash = crypt(coalesce(p_code,''), code_hash) then 'admin'
+              when staff_hash is not null and staff_hash = crypt(coalesce(p_code,''), staff_hash) then 'staff' end
+    into r from panel_settings where id = 1;
+  insert into panel_attempts (ok) values (r is not null);
+  delete from panel_attempts where at < now() - interval '1 day';
+  return r;
+end $$;
+revoke all on function panel_role(text) from public, anon, authenticated;
+
+-- le code patron seulement (prix, modèles, livraison Europe, codes…)
+create or replace function panel_check(p_code text) returns boolean
+language plpgsql security definer set search_path = public as $$
+begin return panel_role(p_code) = 'admin'; end $$;
+revoke all on function panel_check(text) from public, anon, authenticated;
+
+create or replace function panel_whoami(p_code text) returns text
+language plpgsql security definer set search_path = public as $$
+begin return coalesce(panel_role(p_code), 'none'); end $$;
+grant execute on function panel_whoami(text) to anon;
+
+create or replace function panel_orders(p_code text) returns json
+language plpgsql security definer set search_path = public as $$
+declare r text := panel_role(p_code);
+begin
+  if r is null then return json_build_object('error', 'bad code'); end if;
+  return coalesce((select json_agg(json_build_object(
+    'id', id, 'no', order_no, 'date', created_at, 'status', status, 'changed', status_changed_at,
+    'name', name, 'phone', phone, 'phone2', phone2, 'wilaya', wilaya, 'commune', commune, 'address', address,
+    'note', note, 'items', items, 'ship', ship_type, 'fee', ship_fee, 'device', device, 'renew', renew, 'total', total_da, 'cur', currency
+  ) order by created_at desc) from site_orders
+    where not deleted and (r = 'admin' or (currency <> 'EUR' and wilaya not like '🇪🇺%'))), '[]'::json);
+end $$;
+
+create or replace function panel_set_status(p_code text, p_id uuid, p_status text) returns boolean
+language plpgsql security definer set search_path = public as $$
+declare r text := panel_role(p_code);
+begin
+  if r is null then return false; end if;
+  update site_orders set status = p_status, status_changed_at = now()
+   where id = p_id and (r = 'admin' or (currency <> 'EUR' and wilaya not like '🇪🇺%'));
+  return true;
+end $$;
+
+create or replace function panel_set_fee(p_code text, p_id uuid, p_fee integer) returns boolean
+language plpgsql security definer set search_path = public as $$
+declare f int := greatest(0, least(100000, coalesce(p_fee, 0))); r text := panel_role(p_code);
+begin
+  if r is null then return false; end if;
+  update site_orders set total_da = total_da - coalesce(ship_fee, 0) + f, ship_fee = f, ship_type = coalesce(ship_type, 'home')
+   where id = p_id and (r = 'admin' or (currency <> 'EUR' and wilaya not like '🇪🇺%'));
+  return true;
+end $$;
+
+-- supprimer une commande : code patron seulement (panel_delete garde panel_check)
+
+-- le patron choisit / change le code de Salima
+create or replace function panel_set_staff_code(p_code text, p_new text) returns boolean
+language plpgsql security definer set search_path = public, extensions as $$
+begin
+  if not panel_check(p_code) then return false; end if;
+  if coalesce(p_new,'') !~ '^[0-9]{6}$' or p_new = p_code then return false; end if;
+  update panel_settings set staff_hash = crypt(p_new, gen_salt('bf')) where id = 1;
+  return true;
+end $$;
+grant execute on function panel_set_staff_code(text,text) to anon;
+
+-- le code patron ne peut pas devenir le même que celui de Salima
+create or replace function panel_change_code(p_code text, p_new text) returns boolean
+language plpgsql security definer set search_path = public, extensions as $$
+declare sh text;
+begin
+  if not panel_check(p_code) then return false; end if;
+  if coalesce(p_new,'') !~ '^[0-9]{6}$' then return false; end if;
+  select staff_hash into sh from panel_settings where id = 1;
+  if sh is not null and sh = crypt(p_new, sh) then return false; end if;
+  update panel_settings set code_hash = crypt(p_new, gen_salt('bf')) where id = 1;
+  return true;
+end $$;
+select 'ok' as v951;
