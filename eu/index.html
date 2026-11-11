@@ -92,7 +92,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}f
 <footer>© 2026 ATOM · <a href="https://instagram.com/islem_atom" target="_blank" rel="noopener">Développé par Islamatom</a></footer>
 <script>
 const CONFIG = { url: 'https://zgwdjbliabxablrianko.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpnd2RqYmxpYWJ4YWJscmlhbmtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxNjY0NjAsImV4cCI6MjEwOTc0MjQ2MH0.bc4ML01qc2pDTP9vzJ2yTDs-uYz6Q-lY8CuyADPQT-c' };
-const SHIP = null; // frais fixes en € (null = à confirmer)
+let SHIP = null; // frais de livraison en € (réglés dans le panel)
 const WA = '32499374830';
 let PRODUCTS = [
   { key:'eu_s3', slug:'s3', name:'ATOM S3', price:99, imgs:['img/s3.jpg','img/s3-1.jpg','img/s3-2.jpg','img/s3-3.jpg'], desc:'3ᵉ génération · Android 14 · Wi-Fi 6 · BT 6.0',
@@ -116,7 +116,8 @@ const eurf = n => new Intl.NumberFormat('fr-BE', { style:'currency', currency:'E
 const $ = id => document.getElementById(id);
 $('country').innerHTML = COUNTRIES.map(c => `<option>${c}</option>`).join('');
 const card = p => `<button type="button" class="p" data-k="${p.key}"><div class="im">${p.imgs[0] ? `<img src="${p.imgs[0]}" alt="${p.name}" loading="lazy">` : '📦'}</div><div class="b"><b>${p.name}</b><small>${p.desc}</small><span class="pr">${eurf(p.price)}</span><span class="tva">TVA comprise</span></div></button>`;
-$('grid').innerHTML = PRODUCTS.map(card).join('');
+function grid(){ $('grid').innerHTML = PRODUCTS.map(card).join(''); }
+grid();
 function paint(){
   const p = PRODUCTS.find(x => x.key === sel); $('q').textContent = qty;
   $('sl').textContent = `${qty} × ${p.name}`; $('sp').textContent = eurf(p.price * qty);
@@ -167,6 +168,25 @@ $('f').addEventListener('submit', async e => {
   btn.disabled = false; btn.textContent = 'Commander';
 });
 route();
+// catalogue géré depuis le panel (Supabase) — la liste ci-dessus sert de secours
+(async () => {
+  if (!/^https?:$/.test(location.protocol)) return;
+  const H = { apikey: CONFIG.key, Authorization: `Bearer ${CONFIG.key}` }, U = CONFIG.url + '/rest/v1/';
+  try {
+    const [rows, set] = await Promise.all([
+      fetch(U + 'site_catalog_eu?select=key,slug,name,price_eur,descr,specs,inbox,imgs&active=eq.true&order=sort_order', { headers: H }).then(r => r.ok ? r.json() : Promise.reject()),
+      fetch(U + 'site_settings?select=val&key=eq.eu_ship', { headers: H }).then(r => r.ok ? r.json() : []).catch(() => [])
+    ]);
+    if (set[0] && typeof set[0].val === 'number') SHIP = set[0].val;
+    if (!Array.isArray(rows) || !rows.length) { paint(); return; }
+    const ids = [...new Set(rows.flatMap(r => (r.imgs || []).filter(s => s.startsWith('db:')).map(s => s.slice(3))))];
+    const pics = {};
+    if (ids.length) (await fetch(U + `site_img?select=id,data&id=in.(${ids.join(',')})`, { headers: H }).then(r => r.ok ? r.json() : [])).forEach(x => pics[x.id] = x.data);
+    PRODUCTS = rows.map(r => ({ key: r.key, slug: r.slug || r.key.slice(3), name: r.name, price: r.price_eur, desc: r.descr || '', specs: r.specs || [], inbox: (r.inbox || []).length ? r.inbox : null,
+      imgs: (r.imgs || []).map(s => s.startsWith('db:') ? pics[s.slice(3)] : s).filter(Boolean) }));
+    grid(); if ($('f').hidden) route(); else paint();
+  } catch (e) {}
+})();
 </script>
 </body>
 </html>

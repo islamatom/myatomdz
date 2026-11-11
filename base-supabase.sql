@@ -219,3 +219,120 @@ grant execute on function panel_set_fee(text,uuid,integer) to anon;
 -- v9.45 : Mutant Inferno ProMax (portail Europe)
 insert into site_catalog_eu (key, name, price_eur, sort_order) values ('eu_inferno','Mutant Inferno ProMax',99,5)
 on conflict (key) do update set price_eur = excluded.price_eur, name = excluded.name;
+-- ---------- v9.47 : produits Europe gérés depuis le panel ----------
+alter table site_catalog_eu add column if not exists slug text;
+alter table site_catalog_eu add column if not exists descr text not null default '';
+alter table site_catalog_eu add column if not exists specs jsonb not null default '[]'::jsonb;
+alter table site_catalog_eu add column if not exists inbox jsonb not null default '[]'::jsonb;
+alter table site_catalog_eu add column if not exists imgs jsonb not null default '[]'::jsonb;
+
+create table if not exists site_img (id uuid primary key default gen_random_uuid(), data text not null, created_at timestamptz not null default now());
+alter table site_img enable row level security;
+drop policy if exists "photos visibles" on site_img;
+create policy "photos visibles" on site_img for select to anon using (true);
+grant select on site_img to anon;
+
+create table if not exists site_settings (key text primary key, val jsonb);
+alter table site_settings enable row level security;
+drop policy if exists "reglages visibles" on site_settings;
+create policy "reglages visibles" on site_settings for select to anon using (true);
+grant select on site_settings to anon;
+insert into site_settings (key, val) values ('eu_ship', 'null'::jsonb) on conflict (key) do nothing;
+
+create or replace function panel_eu_list(p_code text) returns json
+language plpgsql security definer set search_path = public as $$
+begin
+  if not panel_check(p_code) then return 'false'::json; end if;
+  return json_build_object('ship', (select val from site_settings where key = 'eu_ship'),
+    'items', coalesce((select json_agg(c order by c.sort_order, c.key) from site_catalog_eu c), '[]'::json));
+end $$;
+grant execute on function panel_eu_list(text) to anon;
+
+create or replace function panel_eu_save(p_code text, p_key text, p_name text, p_price integer, p_descr text, p_specs jsonb, p_inbox jsonb, p_imgs jsonb, p_active boolean, p_sort integer)
+returns boolean language plpgsql security definer set search_path = public as $$
+begin
+  if not panel_check(p_code) then return false; end if;
+  if p_key !~ '^eu_[a-z0-9_]{1,40}$' or length(trim(coalesce(p_name,''))) < 2 then raise exception 'bad'; end if;
+  insert into site_catalog_eu (key, slug, name, price_eur, descr, specs, inbox, imgs, active, sort_order)
+  values (p_key, substr(p_key, 4), left(trim(p_name), 60), greatest(0, least(100000, coalesce(p_price, 0))), left(coalesce(p_descr,''), 160),
+          coalesce(p_specs,'[]'), coalesce(p_inbox,'[]'), coalesce(p_imgs,'[]'), coalesce(p_active, true), coalesce(p_sort, 99))
+  on conflict (key) do update set name = excluded.name, price_eur = excluded.price_eur, descr = excluded.descr, specs = excluded.specs,
+    inbox = excluded.inbox, imgs = excluded.imgs, active = excluded.active, sort_order = excluded.sort_order, slug = coalesce(site_catalog_eu.slug, excluded.slug);
+  return true;
+end $$;
+grant execute on function panel_eu_save(text,text,text,integer,text,jsonb,jsonb,jsonb,boolean,integer) to anon;
+
+create or replace function panel_eu_delete(p_code text, p_key text) returns boolean
+language plpgsql security definer set search_path = public as $$
+begin
+  if not panel_check(p_code) then return false; end if;
+  delete from site_catalog_eu where key = p_key; return true;
+end $$;
+grant execute on function panel_eu_delete(text,text) to anon;
+
+create or replace function panel_img_add(p_code text, p_data text) returns text
+language plpgsql security definer set search_path = public as $$
+declare i uuid;
+begin
+  if not panel_check(p_code) then return null; end if;
+  if p_data !~ '^data:image/(jpeg|png|webp);base64,' or length(p_data) > 600000 then raise exception 'bad image'; end if;
+  insert into site_img (data) values (p_data) returning id into i; return i::text;
+end $$;
+grant execute on function panel_img_add(text,text) to anon;
+
+create or replace function panel_set_setting(p_code text, p_key text, p_val jsonb) returns boolean
+language plpgsql security definer set search_path = public as $$
+begin
+  if not panel_check(p_code) then return false; end if;
+  if p_key not in ('eu_ship') then raise exception 'bad'; end if;
+  insert into site_settings (key, val) values (p_key, p_val) on conflict (key) do update set val = excluded.val; return true;
+end $$;
+grant execute on function panel_set_setting(text,text,jsonb) to anon;
+
+-- livraison Europe : le serveur prend le tarif du panel (le site ne décide plus)
+create or replace function submit_eu_order(p_name text, p_phone text, p_country text, p_city text, p_zip text, p_address text, p_items jsonb, p_ship integer default 0, p_email text default null)
+returns json language plpgsql security definer set search_path = public as $$
+declare it jsonb; c site_catalog_eu; lines jsonb := '[]'::jsonb; sub int := 0; q int; fee int; o site_orders; ph text; sv jsonb;
+begin
+  ph := regexp_replace(coalesce(p_phone,''), '[^0-9+]', '', 'g');
+  if length(trim(coalesce(p_name,''))) < 2 then raise exception 'name'; end if;
+  if ph !~ '^\+?[0-9]{8,15}$' then raise exception 'phone'; end if;
+  if coalesce(p_country,'') = '' or coalesce(p_address,'') = '' then raise exception 'address'; end if;
+  if (select count(*) from site_orders where phone = ph and created_at > now() - interval '1 hour') >= 3 then raise exception 'too many orders'; end if;
+  for it in select * from jsonb_array_elements(coalesce(p_items,'[]'::jsonb)) loop
+    select * into c from site_catalog_eu where key = it->>'key' and active;
+    if not found then continue; end if;
+    q := greatest(1, least(10, coalesce((it->>'qty')::int, 1)));
+    lines := lines || jsonb_build_object('key', c.key, 'name', c.name, 'qty', q, 'price', c.price_eur);
+    sub := sub + c.price_eur * q;
+  end loop;
+  if jsonb_array_length(lines) = 0 then raise exception 'empty'; end if;
+  select val into sv from site_settings where key = 'eu_ship';
+  fee := case when jsonb_typeof(sv) = 'number' then greatest(0, (sv)::text::int) else 0 end;
+  insert into site_orders (name, phone, wilaya, commune, address, note, items, ship_type, ship_fee, total_da, currency)
+  values (left(trim(p_name),80), left(ph,16), '🇪🇺 ' || left(p_country,40), left(p_city,60), left(coalesce(p_zip,'') || ' ' || p_address,200),
+          nullif('💳 SumUp' || coalesce(' · ' || left(p_email,80),''),''), lines, 'home', fee, sub + fee, 'EUR')
+  returning * into o;
+  return json_build_object('order_no', o.order_no, 'total', o.total_da);
+end $$;
+
+-- fiches actuelles
+update site_catalog_eu set slug='s3', descr='3ᵉ génération · Android 14 · Wi-Fi 6 · BT 6.0',
+  specs='["Processeur S905Y4 quatre cœurs (le plus récent)","Android 14","4K Ultra HD · HDR","Wi-Fi 6 · Bluetooth 6.0","HDMI"]',
+  imgs='["img/s3.jpg","img/s3-1.jpg","img/s3-2.jpg","img/s3-3.jpg"]' where key='eu_s3';
+update site_catalog_eu set slug='s2', descr='4K HDR · Dolby Atmos · Wi-Fi 6',
+  specs='["4K HDR","Android 13","Dolby Atmos","Wi-Fi 6"]',
+  imgs='["img/s2.jpg","img/s2-1.jpg","img/s2-2.jpg","img/s2-3.jpg","img/s2-4.jpg"]' where key='eu_s2';
+update site_catalog_eu set slug='ax4', name='ATOM AX4 Ultra', descr='Amlogic S905X4 · 4 Go DDR4 · 64 Go · Wi-Fi 5G · HDMI 2.1',
+  specs='["Processeur Amlogic S905X4","4 Go de RAM DDR4","64 Go de stockage","Wi-Fi 5 GHz","HDMI 2.1"]',
+  imgs='["img/ax4-1.jpg","img/ax4-2.jpg","img/ax4-3.jpg","img/ax4-4.jpg"]' where key='eu_ax4';
+update site_catalog_eu set slug='m10', descr='8K · Amlogic S905X3 · Wi-Fi 5,8 GHz · LAN Gigabit',
+  specs='["Image jusqu''à 8K (7680 × 4320) · 4K à 75 i/s","Processeur Amlogic S905X3 quatre cœurs jusqu''à 1,91 GHz","GPU Mali-G31 MP2 (OpenGL ES 3.2, Vulkan)","2 Go de RAM · 16 Go eMMC","Android 9.0 · Smart TV Online 2","Wi-Fi double bande 5,8 GHz 2×2 AC · Bluetooth 4.2","Ethernet Gigabit 1000 Mbit","Décodage 8K@30 i/s, 4K@75 i/s · H.265, H.264, MPEG, VC-1","105 × 105 × 19,5 mm · noir · LED blanche","Alimentation USB-C 5 V / 2 A · max. 12 W · veille 0,5 W"]',
+  inbox='["Boîtier M10 8K","Télécommande rétroéclairée","Alimentation 5 V 2 A","Câble USB-C","Câble HDMI 8K","2 piles AAA","Notice en 6 langues (dont FR)"]',
+  imgs='["img/m10-1.jpg","img/m10-2.jpg","img/m10-3.jpg"]' where key='eu_m10';
+update site_catalog_eu set slug='inferno', descr='8K · Amlogic S905X3 · 4 Go DDR4 · 32 Go · Wi-Fi 2,4/5 GHz · Bluetooth',
+  specs='["Image jusqu''à 8K","Processeur Amlogic S905X3 · GPU Mali-G31","4 Go de RAM DDR4 · 32 Go de stockage","Wi-Fi 2,4 / 5 GHz · Bluetooth · Ethernet","Écran en façade (heure, Wi-Fi, réseau)","Arrière : HDMI, Ethernet, sortie optique, AV · USB 3.0 + USB 2.0 · micro SD","Télécommande Mutant (touches TV, Live, Films, Séries, YouTube)"]',
+  imgs='["img/inferno-1.jpg","img/inferno-2.jpg"]' where key='eu_inferno';
+insert into site_catalog_eu (key, slug, name, price_eur, sort_order, active, descr, specs, imgs) values
+  ('eu_telecommande','telecommande','Télécommande ATOM',0,6,false,'Télécommande Bluetooth de rechange','["Bluetooth","Touches Netflix, YouTube, Prime Video","Compatible ATOM S3 et S2"]','["img/remote-1.jpg","img/remote-2.jpg","img/remote-3.jpg"]')
+on conflict (key) do nothing;
