@@ -7,7 +7,7 @@
 <meta name="description" content="ATOM S3, S2, AX4 et M10 — boîtiers Android TV 4K livrés dans toute l'Europe. Paiement sécurisé SumUp.">
 <meta name="robots" content="noindex">
 <meta property="og:type" content="website"><meta property="og:site_name" content="ATOM"><meta property="og:title" content="ATOM Europe — Boîtiers Android TV 4K">
-<meta property="og:description" content="ATOM S3 99 € · S2 89 € · AX4 109 € · M10 119 € — livraison dans toute l'Europe, paiement sécurisé SumUp.">
+<meta property="og:description" content="ATOM S3 99 € · S2 89 € · AX4 109 € · M10 119 € TVA comprise — livraison dans toute l'Europe, paiement sécurisé SumUp.">
 <meta property="og:image" content="https://atomdz.com/og/og-eu.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#000212">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
@@ -29,7 +29,8 @@ button,a,input,select{touch-action:manipulation;font:inherit}input,select{font-s
 .p.on{border-color:var(--mint);box-shadow:0 0 0 3px #00c8dc33}
 .p .im{aspect-ratio:1;background:radial-gradient(circle at 50% 40%,#16305e,#050a1a 75%);display:grid;place-items:center;font-size:54px}.p .im img{width:100%;height:100%;object-fit:cover}
 .p .im{position:relative}.dots{position:absolute;bottom:8px;left:0;right:0;display:flex;gap:5px;justify-content:center}.dots i{width:7px;height:7px;border-radius:50%;background:#fff6}.dots i.on{background:#00c8dc}
-.p .b{padding:10px 12px 12px}.p b{display:block;font-size:16px}.p small{color:var(--muted);font-size:12px;display:block;min-height:32px}.p .pr{font-size:22px;font-weight:800;color:var(--mint)}
+.p .b{padding:10px 12px 12px}.p b{display:block;font-size:16px}.p small{color:var(--muted);font-size:12px;display:block;min-height:32px}.p .tva{display:block;font-size:11px;font-weight:700;color:var(--muted)}.tvac{font-size:12px;font-weight:700;color:var(--muted)}
+.p .pr{font-size:22px;font-weight:800;color:var(--mint)}
 .box{border-radius:22px;padding:18px;background:var(--ink2);border:1px solid var(--line);margin:18px 0}
 .box h2{margin:0 0 12px;font-size:20px}
 .f{display:grid;gap:5px;margin-bottom:11px}.f span{font-weight:700;font-size:14px}.f span i{color:#ff4d5e;font-style:normal}
@@ -49,7 +50,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}f
 <header class="hdr"><div class="logo">AT<i>✻</i>M</div><span class="flag">🇪🇺 EUROPE</span><button class="ib" id="th" type="button" aria-label="Jour / nuit">☀️</button></header>
 <main class="wrap">
   <section class="hero"><h1>Boîtiers <em>Android TV 4K</em><br>livrés en Europe</h1><p>Choisissez votre boîtier, remplissez le formulaire : on vous envoie le lien de paiement sécurisé SumUp sur WhatsApp.</p></section>
-  <div class="trust"><div>🚚 Livraison dans toute l'Europe</div><div>💳 Paiement sécurisé SumUp</div><div>🛡️ Garantie 1 an</div><div>💬 Support WhatsApp</div></div>
+  <div class="trust"><div>🚚 Livraison dans toute l'Europe</div><div>💳 Paiement sécurisé SumUp</div><div>🧾 Prix TVA comprise</div><div>🛡️ Garantie 1 an</div><div>💬 Support WhatsApp</div></div>
   <h2 style="margin:20px 0 0">1. Choisissez votre boîtier</h2>
   <div class="grid" id="grid"></div>
   <form class="box" id="f" novalidate>
@@ -61,10 +62,10 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}f
     <label class="f"><span>Pays <i>*</i></span><select name="country" id="country" required></select></label>
     <div class="two"><label class="f"><span>Code postal <i>*</i></span><input name="zip" autocomplete="postal-code" required maxlength="12"></label><label class="f"><span>Ville <i>*</i></span><input name="city" autocomplete="address-level2" required maxlength="60"></label></div>
     <label class="f"><span>Adresse (rue et numéro) <i>*</i></span><input name="address" autocomplete="street-address" required maxlength="150"></label>
-    <div class="sum"><div><span id="sl">—</span><span id="sp">—</span></div><div><span>Livraison</span><span id="ss">—</span></div><div class="tot"><span>Total</span><b id="st">—</b></div></div>
+    <div class="sum"><div><span id="sl">—</span><span id="sp">—</span></div><div><span>Livraison</span><span id="ss">—</span></div><div class="tot"><span>Total <small class="tvac">TVA comprise</small></span><b id="st">—</b></div></div>
     <p class="err" id="err" hidden></p>
     <button class="go" id="go" type="submit">Commander</button>
-    <p class="pay">🔒 Aucune carte demandée ici. Vous payez ensuite par le lien SumUp envoyé sur WhatsApp.</p>
+    <p class="pay">🧾 Tous les prix sont TVA comprise (TVAC). 🔒 Aucune carte demandée ici. Vous payez ensuite par le lien SumUp envoyé sur WhatsApp.</p>
   </form>
   <div class="box done" id="done" hidden></div>
 </main>
@@ -85,7 +86,7 @@ const eurf = n => new Intl.NumberFormat('fr-BE', { style:'currency', currency:'E
 const $ = id => document.getElementById(id);
 $('country').innerHTML = COUNTRIES.map(c => `<option>${c}</option>`).join('');
 function paint(){
-  $('grid').innerHTML = PRODUCTS.map(p => `<button type="button" class="p ${p.key === sel ? 'on' : ''}" data-k="${p.key}"><div class="im" ${p.imgs ? `data-gal="${p.key}"` : ''}>${p.img ? `<img src="${(p.imgs ? p.imgs[GI[p.key] || 0] : p.img)}" alt="${p.name}" loading="lazy">` : '📦'}${p.imgs ? `<span class="dots">${p.imgs.map((_, i) => `<i class="${i === (GI[p.key] || 0) ? 'on' : ''}"></i>`).join('')}</span>` : ''}</div><div class="b"><b>${p.name}</b><small>${p.desc}</small><span class="pr">${eurf(p.price)}</span></div></button>`).join('');
+  $('grid').innerHTML = PRODUCTS.map(p => `<button type="button" class="p ${p.key === sel ? 'on' : ''}" data-k="${p.key}"><div class="im" ${p.imgs ? `data-gal="${p.key}"` : ''}>${p.img ? `<img src="${(p.imgs ? p.imgs[GI[p.key] || 0] : p.img)}" alt="${p.name}" loading="lazy">` : '📦'}${p.imgs ? `<span class="dots">${p.imgs.map((_, i) => `<i class="${i === (GI[p.key] || 0) ? 'on' : ''}"></i>`).join('')}</span>` : ''}</div><div class="b"><b>${p.name}</b><small>${p.desc}</small><span class="pr">${eurf(p.price)}</span><span class="tva">TVA comprise</span></div></button>`).join('');
   const p = PRODUCTS.find(x => x.key === sel); $('q').textContent = qty;
   $('sl').textContent = `${qty} × ${p.name}`; $('sp').textContent = eurf(p.price * qty);
   $('ss').textContent = SHIP == null ? 'confirmée sur WhatsApp' : eurf(SHIP);
