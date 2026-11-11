@@ -7,7 +7,7 @@
 <meta name="description" content="ATOM S3, S2, AX4, M10 et Mutant Inferno ProMax — boîtiers Android TV 4K / 8K livrés dans toute l'Europe. Paiement sécurisé SumUp.">
 <meta name="robots" content="noindex">
 <meta property="og:type" content="website"><meta property="og:site_name" content="ATOM"><meta property="og:title" content="ATOM Europe — Boîtiers Android TV 4K">
-<meta property="og:description" content="ATOM S3 99 € · S2 89 € · AX4 109 € · M10 119 € TVA comprise — livraison dans toute l'Europe, paiement sécurisé SumUp.">
+<meta property="og:description" content="ATOM S3, S2, AX4, M10, Mutant Inferno ProMax — boîtiers Android TV, paiement sécurisé SumUp.">
 <meta property="og:image" content="https://atomdz.com/og/og-eu.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#000212">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
@@ -52,6 +52,17 @@ button,a,input,select{touch-action:manipulation;font:inherit}input,select{font-s
 .pt{margin:16px 0 2px;font-size:28px;line-height:1.15}.pp{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.pp b{font-size:32px;color:var(--mint)}.pp span{font-weight:700;color:var(--muted);font-size:13px}
 .specs{list-style:none;padding:0;margin:14px 0;display:grid;gap:8px}.specs li{display:flex;gap:10px;align-items:center;padding:11px 13px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-weight:700;font-size:14px}.specs li::before{content:'✓';color:var(--mint);font-weight:800}
 .inbox{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}.inbox span{font-size:12px;font-weight:700;padding:6px 10px;border-radius:99px;background:#00c8dc1f;color:var(--mint)}
+.show{position:relative;aspect-ratio:1;border-radius:26px;overflow:hidden;margin:18px 0 6px;background:radial-gradient(circle at 50% 40%,#16305e,#050a1a 75%);box-shadow:0 20px 50px #00c8dc26;cursor:pointer}
+.show .sl{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .9s ease}.show .sl.on{opacity:1;pointer-events:auto}
+.show img{width:100%;height:100%;object-fit:cover;transform:scale(1.02)}.show .sl.on img{animation:kb 4.2s ease-out forwards}
+.show .cap>*{opacity:0;transform:translateY(18px)}.show .sl.on .cap>*{animation:up .7s .25s cubic-bezier(.2,.8,.2,1) forwards}.show .sl.on .cap span{animation-delay:.4s}
+@keyframes up{to{opacity:1;transform:none}}
+.show::after{content:'';position:absolute;inset:0;border-radius:26px;box-shadow:inset 0 0 0 1.5px #00e5ff40;pointer-events:none}
+@keyframes kb{from{transform:scale(1.02)}to{transform:scale(1.1)}}
+.show .cap{position:absolute;left:0;right:0;bottom:0;padding:60px 18px 16px;background:linear-gradient(transparent,#000c);display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.show .cap b{font-size:24px;line-height:1.1;color:#fff}.show .cap span{font-size:24px;font-weight:800;color:#00e5ff;white-space:nowrap}
+.show .dt{position:absolute;top:12px;left:0;right:0;display:flex;gap:6px;justify-content:center}.show .dt i{width:22px;height:4px;border-radius:2px;background:#fff5}.show .dt i.on{background:#00e5ff}
+@media (prefers-reduced-motion:reduce){.show .sl.on img,.show .sl.on .cap>*{animation:none;opacity:1;transform:none}}
 .sug h2{font-size:20px;margin:26px 0 10px}.sg{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}.sg .p{flex:0 0 44%;scroll-snap-align:start}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}footer a{color:var(--muted)}
 </style>
@@ -61,14 +72,14 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}f
 <main class="wrap">
   <div class="home" id="home">
   <section class="hero"><h1>Boîtiers <em>Android TV 4K</em></h1><p>Choisissez votre boîtier, remplissez le formulaire : on vous envoie le lien de paiement sécurisé SumUp sur WhatsApp.</p></section>
-  <div class="trust"><div>🚚 Livraison dans toute l'Europe</div><div>💳 Paiement sécurisé SumUp</div><div>🧾 Prix TVA comprise</div><div>🛡️ Garantie 1 an</div><div>💬 Support WhatsApp</div></div>
+  <div class="show" id="show"></div>
   <h2 style="margin:20px 0 0">Choisissez votre boîtier</h2>
   <div class="grid" id="grid"></div>
   </div>
   <div class="pv" id="pv" hidden>
   <button class="back" type="button" id="back">← Tous les modèles</button>
   <div class="gl" id="gl"></div><div class="th" id="thb"></div>
-  <h1 class="pt" id="pt"></h1><div class="pp"><b id="ppr"></b><span>TVA comprise · livraison dans toute l'Europe</span></div>
+  <h1 class="pt" id="pt"></h1><div class="pp"><b id="ppr"></b><span>TVA comprise</span></div>
   <ul class="specs" id="specs"></ul><div class="inbox" id="inb"></div>
   <button class="go" type="button" id="buy">Commander ce modèle</button>
   <form class="box" id="f" novalidate hidden>
@@ -116,7 +127,15 @@ const eurf = n => new Intl.NumberFormat('fr-BE', { style:'currency', currency:'E
 const $ = id => document.getElementById(id);
 $('country').innerHTML = COUNTRIES.map(c => `<option>${c}</option>`).join('');
 const card = p => `<button type="button" class="p" data-k="${p.key}"><div class="im">${p.imgs[0] ? `<img src="${p.imgs[0]}" alt="${p.name}" loading="lazy">` : '📦'}</div><div class="b"><b>${p.name}</b><small>${p.desc}</small><span class="pr">${eurf(p.price)}</span><span class="tva">TVA comprise</span></div></button>`;
-function grid(){ $('grid').innerHTML = PRODUCTS.map(card).join(''); }
+let SI = 0, ST = 0;
+function show(){
+  const L = PRODUCTS.filter(p => p.imgs && p.imgs[0]);
+  $('show').innerHTML = L.map((p, i) => `<div class="sl ${i === SI % L.length ? 'on' : ''}" data-k="${p.key}"><img src="${p.imgs[0]}" alt="${p.name}"><div class="cap"><b>${p.name}</b><span>${eurf(p.price)}</span></div></div>`).join('') + `<div class="dt">${L.map((_, i) => `<i class="${i === SI % L.length ? 'on' : ''}"></i>`).join('')}</div>`;
+  const go = n => { SI = (n + L.length) % L.length; $('show').querySelectorAll('.sl').forEach((x, i) => x.classList.toggle('on', i === SI)); $('show').querySelectorAll('.dt i').forEach((x, i) => x.classList.toggle('on', i === SI)); };
+  window.showGo = go;
+  clearInterval(ST); if (L.length > 1) ST = setInterval(() => go(SI + 1), 3800);
+}
+function grid(){ $('grid').innerHTML = PRODUCTS.map(card).join(''); show(); }
 grid();
 function paint(){
   const p = PRODUCTS.find(x => x.key === sel); $('q').textContent = qty;
@@ -138,6 +157,9 @@ function route(){
   $('sg').innerHTML = PRODUCTS.filter(x => x !== p).map(card).join('');
   document.title = p.name + ' — ATOM Europe'; paint();
 }
+let TX = null, SW = false; $('show').addEventListener('touchstart', e => { TX = e.touches[0].clientX; SW = false; }, { passive:true });
+$('show').addEventListener('touchend', e => { if (TX == null) return; const dx = e.changedTouches[0].clientX - TX; TX = null; if (Math.abs(dx) > 40 && window.showGo) { SW = true; showGo(SI + (dx < 0 ? 1 : -1)); clearInterval(ST); ST = setInterval(() => showGo(SI + 1), 3800); } });
+$('show').addEventListener('click', e => { if (SW) { e.stopPropagation(); SW = false; } }, true);
 $('gl').addEventListener('scroll', () => { const i = Math.round($('gl').scrollLeft / $('gl').clientWidth); document.querySelectorAll('#thb button').forEach((b, j) => b.classList.toggle('on', j === Math.abs(i))); }, { passive:true });
 window.addEventListener('hashchange', route);
 document.addEventListener('click', e => {
