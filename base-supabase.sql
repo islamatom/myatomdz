@@ -215,3 +215,7 @@ begin
   return true;
 end $$;
 grant execute on function panel_set_fee(text,uuid,integer) to anon;
+
+-- v9.45 : Mutant Inferno ProMax (portail Europe)
+insert into site_catalog_eu (key, name, price_eur, sort_order) values ('eu_inferno','Mutant Inferno ProMax',99,5)
+on conflict (key) do update set price_eur = excluded.price_eur, name = excluded.name;
