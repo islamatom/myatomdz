@@ -28,6 +28,7 @@ button,a,input,select{touch-action:manipulation;font:inherit}input,select{font-s
 .p{display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:var(--card);border:1.5px solid var(--line);cursor:pointer;text-align:left;color:var(--text);padding:0}
 .p.on{border-color:var(--mint);box-shadow:0 0 0 3px #00c8dc33}
 .p .im{aspect-ratio:1;background:radial-gradient(circle at 50% 40%,#16305e,#050a1a 75%);display:grid;place-items:center;font-size:54px}.p .im img{width:100%;height:100%;object-fit:cover}
+.p .im{position:relative}.dots{position:absolute;bottom:8px;left:0;right:0;display:flex;gap:5px;justify-content:center}.dots i{width:7px;height:7px;border-radius:50%;background:#fff6}.dots i.on{background:#00c8dc}
 .p .b{padding:10px 12px 12px}.p b{display:block;font-size:16px}.p small{color:var(--muted);font-size:12px;display:block;min-height:32px}.p .pr{font-size:22px;font-weight:800;color:var(--mint)}
 .box{border-radius:22px;padding:18px;background:var(--ink2);border:1px solid var(--line);margin:18px 0}
 .box h2{margin:0 0 12px;font-size:20px}
@@ -75,22 +76,23 @@ const WA = '32499374830';
 let PRODUCTS = [
   { key:'eu_s3', name:'ATOM S3', price:99, img:'img/s3.jpg', desc:'3ᵉ génération · Android 14 · Wi-Fi 6 · BT 6.0' },
   { key:'eu_s2', name:'ATOM S2', price:89, img:'img/s2.jpg', desc:'4K HDR · Dolby Atmos · Wi-Fi 6' },
-  { key:'eu_ax4', name:'ATOM AX4', price:109, img:'', desc:'Boîtier Android TV 4K' },
+  { key:'eu_ax4', name:'ATOM AX4 Ultra', price:109, img:'img/ax4-1.jpg', imgs:['img/ax4-1.jpg','img/ax4-2.jpg','img/ax4-3.jpg','img/ax4-4.jpg'], desc:'Amlogic S905X4 · 4 Go DDR4 · 64 Go · Wi-Fi 5G · HDMI 2.1' },
   { key:'eu_m10', name:'ATOM M10', price:119, img:'', desc:'Boîtier Android TV 4K' },
 ];
 const COUNTRIES = ['Belgique','France','Pays-Bas','Luxembourg','Allemagne','Espagne','Italie','Portugal','Suisse','Autriche','Irlande','Danemark','Suède','Norvège','Finlande','Pologne','Tchéquie','Grèce','Roumanie','Hongrie','Royaume-Uni','Autre pays d\'Europe'];
-let sel = 'eu_s3', qty = 1;
+let sel = 'eu_s3', qty = 1; const GI = {};
 const eurf = n => new Intl.NumberFormat('fr-BE', { style:'currency', currency:'EUR', maximumFractionDigits: n % 1 ? 2 : 0 }).format(n);
 const $ = id => document.getElementById(id);
 $('country').innerHTML = COUNTRIES.map(c => `<option>${c}</option>`).join('');
 function paint(){
-  $('grid').innerHTML = PRODUCTS.map(p => `<button type="button" class="p ${p.key === sel ? 'on' : ''}" data-k="${p.key}"><div class="im">${p.img ? `<img src="${p.img}" alt="${p.name}" loading="lazy">` : '📦'}</div><div class="b"><b>${p.name}</b><small>${p.desc}</small><span class="pr">${eurf(p.price)}</span></div></button>`).join('');
+  $('grid').innerHTML = PRODUCTS.map(p => `<button type="button" class="p ${p.key === sel ? 'on' : ''}" data-k="${p.key}"><div class="im" ${p.imgs ? `data-gal="${p.key}"` : ''}>${p.img ? `<img src="${(p.imgs ? p.imgs[GI[p.key] || 0] : p.img)}" alt="${p.name}" loading="lazy">` : '📦'}${p.imgs ? `<span class="dots">${p.imgs.map((_, i) => `<i class="${i === (GI[p.key] || 0) ? 'on' : ''}"></i>`).join('')}</span>` : ''}</div><div class="b"><b>${p.name}</b><small>${p.desc}</small><span class="pr">${eurf(p.price)}</span></div></button>`).join('');
   const p = PRODUCTS.find(x => x.key === sel); $('q').textContent = qty;
   $('sl').textContent = `${qty} × ${p.name}`; $('sp').textContent = eurf(p.price * qty);
   $('ss').textContent = SHIP == null ? 'confirmée sur WhatsApp' : eurf(SHIP);
   $('st').textContent = eurf(p.price * qty + (SHIP || 0));
 }
 document.addEventListener('click', e => {
+  const g = e.target.closest('[data-gal]'); if (g) { const p = PRODUCTS.find(x => x.key === g.dataset.gal); GI[p.key] = ((GI[p.key] || 0) + 1) % p.imgs.length; sel = p.key; paint(); return; }
   const c = e.target.closest('[data-k]'); if (c) { sel = c.dataset.k; paint(); $('f').scrollIntoView({ behavior:'smooth' }); }
   const q = e.target.closest('[data-q]'); if (q) { qty = Math.max(1, Math.min(10, qty + +q.dataset.q)); paint(); }
   if (e.target.closest('#th')) { const t = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; document.documentElement.dataset.theme = t; try { localStorage.setItem('atom-theme', t); } catch (x) {} }
