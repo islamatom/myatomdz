@@ -403,7 +403,7 @@ html[dir="rtl"] .atmos{align-items:flex-start}
 @keyframes atmos-heart{0%,100%{transform:scale(1);transform-origin:60px 93px}50%{transform:scale(1.35);transform-origin:60px 93px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.hero-drop,.hero-near{transform:none!important}}
 
-/* ===== v9.40 : mode jour ===== */
+/* ===== v9.41 : mode jour ===== */
 html[data-theme="light"]{
   --ink:#f3f6fb;--ink2:#ffffff;--navy:#e3eaf6;--line:#d6dfee;
   --mint:#14a06e;--blue:#3d63d8;--sun:#c97a12;--rose:#d9455b;
@@ -440,7 +440,7 @@ html[data-theme="light"] .empty{border:1px dashed #0b13242a}
 html[data-theme="light"] .total{border-top:1px solid #0b13241a}
 html[data-theme="light"] footer{border-top:1px solid #0b132412}
 html[data-theme="light"] .sticky-cta{background:#fffffff2;border:1px solid #0b132422;box-shadow:0 14px 40px #0b132426}
-/* ===== v9.40 : cadenas, soleil/lune, règles ===== */
+/* ===== v9.41 : cadenas, soleil/lune, règles ===== */
 .icon-btn{flex:0 0 auto;width:40px;height:40px;border-radius:12px;border:1px solid #ffffff22;background:#ffffff10;color:var(--text);font-size:18px;display:inline-flex;align-items:center;justify-content:center;padding:0}
 html[data-theme="light"] .icon-btn{border-color:#0b132422;background:#0b132408}
 .lock-btn{order:-1}
@@ -472,7 +472,7 @@ html[data-theme="light"] .code-pad button{border-color:#0b13241a;background:#0b1
 .v-tag{font:700 11px 'Plus Jakarta Sans';opacity:.6}
 @media (max-width:520px){.icon-btn{width:36px;height:36px;font-size:16px}.lang button{padding:5px 8px}}
 
-/* ===== v9.40 : l'atome qui tourne ===== */
+/* ===== v9.41 : l'atome qui tourne ===== */
 .atom-spin{position:absolute;left:50%;top:50%;width:min(118%,560px);aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;overflow:visible}
 .atom-rot{transform-origin:200px 200px;animation:atomRot 24s linear infinite}
 .atom-nuc{transform-origin:200px 200px;animation:atomPulse 2.6s ease-in-out infinite}
@@ -484,7 +484,7 @@ html[data-theme="light"] .code-pad button{border-color:#0b13241a;background:#0b1
 html[data-theme="light"] .atom-spin ellipse{stroke-opacity:.8}
 @media (max-width:960px){.atom-spin{width:min(96vw,440px)}}
 
-/* ===== v9.40 : 3D plus claire sur téléphone ===== */
+/* ===== v9.41 : 3D plus claire sur téléphone ===== */
 .in-step{position:absolute;z-index:3;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:9px 16px;border-radius:99px;background:#0b1530e6;border:1px solid #00c8dc55;color:#eef3ff;font-weight:800;font-size:15px;white-space:nowrap;box-shadow:0 10px 30px #0008;backdrop-filter:blur(8px)}
 .in-step b{font:800 12px 'Plus Jakarta Sans',sans-serif;color:#062a1d;background:#00c8dc;border-radius:99px;padding:2px 8px}
 .in-stage.is-deep .in-head{opacity:1;transform:none}
@@ -492,7 +492,7 @@ html[data-theme="light"] .atom-spin ellipse{stroke-opacity:.8}
 @media (max-width:600px){.in-step{bottom:calc(170px + env(safe-area-inset-bottom,0px))}.in-label b{font-size:12px}.in-label span{padding:4px 8px}.in-hint{display:none}.in-step{font-size:14px}}
 @media (min-width:961px){.in-step{bottom:40px}}
 
-/* ===== v9.40 : panel des commandes (dans le site) ===== */
+/* ===== v9.41 : panel des commandes (dans le site) ===== */
 .pn{position:fixed;inset:0;z-index:150;background:var(--ink);color:var(--text);overflow-y:auto;-webkit-overflow-scrolling:touch;font-family:var(--font)}
 .pn[hidden]{display:none}
 body.pn-open{overflow:hidden}
@@ -562,7 +562,7 @@ html[data-theme="light"] .pn-st button{border-color:#0b13241a}
 .pn-del.sure{color:#ef4444}
 .pn-toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:3;padding:12px 18px;border-radius:14px;background:var(--mint);color:#062a1d;font-weight:800;box-shadow:0 10px 30px #0006;white-space:nowrap}
 
-/* ===== v9.40 : commande comme atomdz.com ===== */
+/* ===== v9.41 : commande comme atomdz.com ===== */
 .ship{margin:0 0 14px}
 .ship-t{display:block;font-weight:800;font-size:14px;margin-bottom:6px}
 .ship-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -575,7 +575,7 @@ html[data-theme="light"] .pn-st button{border-color:#0b13241a}
 .ship-line{display:flex;justify-content:space-between;margin:10px 0 0;color:var(--muted);font-weight:700}
 html[data-theme="light"] .pn-chip[aria-pressed="true"]{background:#13213d;color:#fff;border-color:#13213d}
 
-/* ===== v9.40 : bouquets + renouvellement ===== */
+/* ===== v9.41 : bouquets + renouvellement ===== */
 .pl-tabs{display:flex;gap:8px;margin:0 0 18px;padding:4px;border-radius:16px;background:#ffffff0d;max-width:520px}
 html[data-theme="light"] .pl-tabs{background:#0b13240a}
 .pl-tab{flex:1;border:0;background:none;color:var(--muted);padding:12px 8px;border-radius:12px;font-weight:800;font-size:15px}
@@ -601,7 +601,7 @@ html[data-theme="light"] .rn-form .ship-opts span{background:#f9fbff;border-colo
 .pn-rn+.pn-badge{margin-inline-start:0}
 .atmos-acts button{font:inherit}
 
-/* ===== v9.40 : vraies photos de la télécommande ===== */
+/* ===== v9.41 : vraies photos de la télécommande ===== */
 .pcard .vis:has(.gal){aspect-ratio:auto;display:block;background:#0b1324}
 .gal{position:relative;perspective:900px;padding:22px 22px 86px;background:radial-gradient(circle at 50% 40%,#2a4a86,#0b1324 72%)}
 .gal-main{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:cover;border-radius:22px;box-shadow:0 30px 50px #000a,0 0 0 1px #ffffff22;transform:rotateX(var(--rx,6deg)) rotateY(var(--ry,-12deg));transition:transform .25s ease-out;animation:galSpin 7s ease-in-out infinite alternate;will-change:transform}
@@ -613,10 +613,10 @@ html[data-theme="light"] .rn-form .ship-opts span{background:#f9fbff;border-colo
 .gal-th button.on{border-color:var(--mint);opacity:1;box-shadow:0 0 0 3px #00c8dc44}
 .gal-th img{width:100%;height:100%;object-fit:cover}
 
-/* ===== v9.40 : 2 bouquets ===== */
+/* ===== v9.41 : 2 bouquets ===== */
 
 
-/* ===== v9.40 : vraies conditions ===== */
+/* ===== v9.41 : vraies conditions ===== */
 .fees{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
 .fees th,.fees td{padding:9px 6px;border-bottom:1px solid #ffffff14;text-align:start}
 html[data-theme="light"] .fees th,html[data-theme="light"] .fees td{border-color:#0b132414}
@@ -624,7 +624,7 @@ html[data-theme="light"] .fees th,html[data-theme="light"] .fees td{border-color
 .fees td.num{white-space:nowrap;font-weight:700}
 .sheet-box b{color:var(--text)}
 
-/* ===== v9.40 : ATOM S2 + Pro Max (pages de Mohamed) ===== */
+/* ===== v9.41 : ATOM S2 + Pro Max (pages de Mohamed) ===== */
 .s2x{background:linear-gradient(180deg,var(--ink),var(--ink2))}
 .s2-hero{display:grid;grid-template-columns:1fr;gap:28px;align-items:center;margin-bottom:34px}
 .s2-cut{width:100%;max-width:340px;margin:0 auto;filter:drop-shadow(0 30px 40px #000a);animation:float 6s ease-in-out infinite}
@@ -661,19 +661,19 @@ html[data-theme="light"] .s2-why>div,html[data-theme="light"] .s2-row,html[data-
 html[data-theme="light"] .s2-table th,html[data-theme="light"] .s2-table td{border-color:#0b132414}
 @media (max-width:760px){.s2-hero,.s2-row,.s2-box{grid-template-columns:1fr}.s2-row:nth-child(even) img{order:0}.s2-cut{max-width:240px}}
 
-/* ===== v9.40 ===== */
+/* ===== v9.41 ===== */
 .s2-row-txt{grid-template-columns:1fr}
 .more{margin-top:22px}.more summary{cursor:pointer;list-style:none;padding:14px 16px;border-radius:16px;background:var(--card);border:1px solid #00c8dc55;font-weight:800;text-align:center}.more summary::-webkit-details-marker{display:none}.more[open] summary{margin-bottom:6px}
 .dev-sign{font-size:13px;color:var(--muted)}.dev-sign b{color:var(--text)}
 
-/* ===== v9.40 : 3D animée toute seule (page plus courte) ===== */
+/* ===== v9.41 : 3D animée toute seule (page plus courte) ===== */
 .in-pin,.in-pin[id]{height:auto!important}
 .in-sticky{position:relative!important;top:0!important;height:min(86svh,760px)!important}
 .in-stage canvas{cursor:pointer}
 .in-hint{display:flex!important;bottom:20px}.in-hint .in-mouse{display:none}
 @media (max-width:600px){.in-sticky{height:min(78svh,640px)!important}.in-step{bottom:56px!important}}
 
-/* ===== v9.40 : liens du bas bien visibles ===== */
+/* ===== v9.41 : liens du bas bien visibles ===== */
 footer{padding-bottom:200px}
 .foot-links{display:grid;grid-template-columns:1fr 1fr;gap:8px;order:-1;margin:0 0 10px;padding:0;border:0}
 .foot-links button{display:flex;align-items:center;gap:8px;padding:12px;border-radius:14px;background:var(--card);border:1px solid #ffffff14;color:var(--text);font-size:14px;text-align:start}
@@ -681,7 +681,7 @@ footer{padding-bottom:200px}
 html[data-theme="light"] .foot-links button{border-color:#0b132414}
 .cform{margin-top:18px;padding-top:14px;border-top:1px solid #ffffff18}.cform textarea{width:100%;resize:vertical}.cform .btn-main{width:100%;margin-top:6px;padding:14px;border:0;border-radius:14px;font:800 16px var(--font);color:#062a1d;background:linear-gradient(135deg,#00c8dc,#0099b0)}.cform small{display:block;margin-top:8px;color:var(--muted)}
 
-/* ===== v9.40 : image vitrine ===== */
+/* ===== v9.41 : image vitrine ===== */
 .showcase{padding:0;background:#03060d}
 .sc-frame{position:relative;overflow:hidden;max-width:1160px;margin:0 auto;aspect-ratio:4/5;max-height:760px}
 @media (min-width:700px){.sc-frame{aspect-ratio:16/9}}
@@ -696,7 +696,7 @@ html[data-theme="light"] .foot-links button{border-color:#0b132414}
 .sc-txt p{margin:0 auto;max-width:36ch;color:#c9d3e6;font-size:15px}
 @media (prefers-reduced-motion:reduce){.sc-img,.sc-shine{animation:none}}
 
-/* ===== v9.40 : style atomdz.com ===== */
+/* ===== v9.41 : style atomdz.com ===== */
 html:not([data-theme="light"]){--ink:#000212;--ink2:#050a1a;--card:#0a1124;--card2:#0e1830;--line:#1a2643;--mint:#00c8dc;--blue:#0099b0;--muted:#8d9cba}
 html:not([data-theme="light"]) .light,html:not([data-theme="light"]) .form{--paper:#000212;--paperInk:#ffffff;--paperMuted:#8d9cba}
 html:not([data-theme="light"]) .light .add,html:not([data-theme="light"]) .light .step b,html:not([data-theme="light"]) .light .score{background:linear-gradient(135deg,#00c8dc,#0099b0);color:#fff}
@@ -713,7 +713,7 @@ html:not([data-theme="light"]) .btn-main{background:linear-gradient(135deg,#00c8
 html:not([data-theme="light"]) .light .pcard,html:not([data-theme="light"]) .light .card{background:#0a1124;color:#fff;border-color:#1a2643}
 .field:has(input[required],select[required])>span::after{content:" *";color:#ff4d5e}
 
-/* ===== v9.40 : commande comme atomdz.com ===== */
+/* ===== v9.41 : commande comme atomdz.com ===== */
 .pick-box{max-width:560px;margin:0 auto;padding:18px;border-radius:24px;background:var(--ink2);border:1px solid var(--line)}
 .pick{border:0;margin:0 0 14px;padding:0;min-width:0}
 .pick legend{font-weight:800;margin-bottom:10px;padding:0}
@@ -738,13 +738,13 @@ body.co-lock .sticky-cta,body.co-lock .atmos{display:none!important}
 
 .atmos-acts button{font-weight:800;color:var(--text)}
 
-/* ===== v9.40 : les photos ne bougent plus ===== */
+/* ===== v9.41 : les photos ne bougent plus ===== */
 .hero-photo,.float,.s2-cut,img.float,.float img{animation:none!important}
 .gal-main{animation:none!important;transform:none!important}
 .sc-img{animation:none!important;transform:none!important}
 .sc-shine{display:none!important}
 
-/* ===== v9.40 : menu ☰ + équipe ===== */
+/* ===== v9.41 : menu ☰ + équipe ===== */
 .menu-btn{display:grid;place-content:center;gap:4px;width:44px;height:44px;padding:0}
 .menu-btn i{display:block;width:20px;height:2px;border-radius:2px;background:currentColor;transition:transform .2s,opacity .2s}
 .menu-btn.on i:nth-child(1){transform:translateY(6px) rotate(45deg)}.menu-btn.on i:nth-child(2){opacity:0}.menu-btn.on i:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
@@ -766,18 +766,18 @@ body.m-open{overflow:hidden}
 .tm p{margin:6px 0;font-size:14px;color:var(--muted)}
 .tm a{color:var(--mint);font-weight:800;text-decoration:none}.tm-m{font-size:12px;color:var(--muted)}
 
-/* ===== v9.40 : la fenêtre du robot ne cache plus le menu ☰ ===== */
+/* ===== v9.41 : la fenêtre du robot ne cache plus le menu ☰ ===== */
 .atmos-panel{max-height:calc(100svh - 200px);overflow-y:auto;-webkit-overflow-scrolling:touch}
 .hdr{z-index:70}
 
-/* ===== v9.40 : image vitrine plus petite, sans grand texte ===== */
+/* ===== v9.41 : image vitrine plus petite, sans grand texte ===== */
 .showcase{padding:10px 16px 26px}
 .sc-frame{aspect-ratio:16/10!important;max-height:340px;max-width:720px;border-radius:22px;border:1px solid var(--line)}
 .sc-frame::after{background:linear-gradient(transparent 60%,#03060dcc)}
 .sc-txt{padding-bottom:16px}
 .sc-img{object-position:50% 12%!important}
 
-/* ===== v9.40 : aide « lequel choisir ? » ===== */
+/* ===== v9.41 : aide « lequel choisir ? » ===== */
 .choose{margin-top:26px;padding:18px;border-radius:24px;background:var(--ink2);border:1px solid var(--line);display:grid;gap:10px}
 .choose h3{margin:0 0 4px;font-size:20px}
 .chz{display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:16px;background:var(--card);border:1px solid var(--line);color:var(--text);font:inherit;text-align:start;cursor:pointer}
@@ -786,17 +786,17 @@ body.m-open{overflow:hidden}
 .chz em{font-style:normal;font-weight:800;font-size:13px;color:#fff;background:linear-gradient(135deg,#00c8dc,#0099b0);padding:6px 10px;border-radius:99px;white-space:nowrap}
 .chz:active{transform:scale(.98)}
 
-/* ===== v9.40 : photo S3 du haut plus petite ===== */
+/* ===== v9.41 : photo S3 du haut plus petite ===== */
 .hero-photo{max-height:min(380px,42svh)!important;margin-inline:auto}
 @media (max-width:600px){.hero-photo{max-height:min(300px,36svh)!important}}
 
-/* ===== v9.40 : plein écran des photos ===== */
+/* ===== v9.41 : plein écran des photos ===== */
 .gal-main{cursor:zoom-in}
 .zoom{position:fixed;inset:0;z-index:99999;background:#000;display:grid;place-items:center;padding:12px}
 .zoom img{max-width:100%;max-height:100%;border-radius:14px;object-fit:contain}
 .zoom button{position:absolute;top:14px;inset-inline-end:14px;width:44px;height:44px;border-radius:50%;border:1px solid #ffffff44;background:#0008;color:#fff;font-size:26px}
 
-/* ===== v9.40 : comparaison S3 / S2 ===== */
+/* ===== v9.41 : comparaison S3 / S2 ===== */
 .df th,.df td{font-size:13.5px;vertical-align:top}
 .df thead th{font-size:14px;color:var(--mint)}
 .df tbody th{color:var(--muted);font-weight:700;white-space:nowrap}
@@ -804,7 +804,7 @@ body.m-open{overflow:hidden}
 .df-go{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
 .df-go .btn{width:100%;padding:14px}
 
-/* ===== v9.40 : changer le code ===== */
+/* ===== v9.41 : changer le code ===== */
 .pk{position:fixed;inset:0;z-index:300;background:#000b;display:grid;place-items:center;padding:16px}
 .pk-box{width:min(380px,100%);padding:20px;border-radius:22px;background:var(--ink2,#0a1124);border:1px solid var(--line,#1a2643);color:var(--text,#fff)}
 .pk-box h3{margin:0 0 12px}
@@ -813,12 +813,12 @@ body.m-open{overflow:hidden}
 .pk-no{width:100%;margin-top:8px;padding:12px;border-radius:50px;border:1px solid var(--line,#1a2643);background:none;color:var(--text,#fff);font:700 15px var(--font)}
 .pk-msg{margin:4px 0 8px;color:#ff6b7a;font-weight:700}.pk-msg.ok{color:#00c8dc}
 
-/* ===== v9.40 : iPhone — pas de zoom quand on tape vite ===== */
+/* ===== v9.41 : iPhone — pas de zoom quand on tape vite ===== */
 html,body,button,a,input,select,textarea,label,[data-key],.code-pad,.code-pad *{touch-action:manipulation}
 .code-pad button{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 input,select,textarea{font-size:max(16px,1em)}
 
-/* ===== v9.40 : renouvellement bien visuel ===== */
+/* ===== v9.41 : renouvellement bien visuel ===== */
 .rn-hero{display:flex;align-items:center;gap:12px;margin-top:16px;padding:14px 16px;border-radius:18px;text-decoration:none;color:#fff;background:linear-gradient(135deg,#0099b0,#00c8dc);box-shadow:0 10px 30px #00c8dc40}
 .rn-hero i{font-style:normal;font-size:26px}.rn-hero span{flex:1;display:grid}.rn-hero b{font-size:17px}.rn-hero small{opacity:.9;font-size:13px}.rn-hero em{font-style:normal;font-size:20px;font-weight:800}
 html[dir="ltr"] .rn-hero em{transform:scaleX(-1)}
@@ -856,7 +856,7 @@ html[data-theme="light"] .rx-dev .ship-opts span{background:#fff;color:#0b1324}
 
 .sticky-acts{display:flex;gap:8px;align-items:center}.sticky-rn{background:#00c8dc22;color:#00c8dc;border:1.5px solid #00c8dc;padding:12px 14px;white-space:nowrap}
 
-/* ===== v9.40 : mise à jour Downloader ===== */
+/* ===== v9.41 : mise à jour Downloader ===== */
 .up{padding:10px 0 30px}
 .up-card{max-width:620px;margin:0 auto;border-radius:28px;padding:22px 18px;background:linear-gradient(180deg,#1a1206,#0b0a10);border:1.5px solid #ff8a1f66;color:#fff}
 html[data-theme="light"] .up-card{background:linear-gradient(180deg,#fff4e8,#fff);color:#1b1206}
@@ -882,6 +882,9 @@ html[data-theme="light"] .up-card{background:linear-gradient(180deg,#fff4e8,#fff
 .ap-home{background:linear-gradient(135deg,#ff6a00,#ff2d55)}.ap-logo{font:900 26px Arial;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#ff2d55}.ap-home b{font-size:13px}
 .dl-logo2{font-size:22px;font-weight:900;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:#ff8a1f;color:#fff}
 .up-note{margin:14px 0 0;font-size:13px;opacity:.8;text-align:center}
+
+@media (max-width:430px){.hdr .brand>div{display:none}.hdr .wrap{gap:8px}}
+.up-btn{display:grid;place-items:center;align-content:center;gap:0;width:46px;height:44px;padding:0;text-decoration:none;background:#ff8a1f22;border:1.5px solid #ff8a1f;color:#ff9a3d}.up-btn span{font-size:16px;line-height:1}.up-btn small{font-size:9.5px;font-weight:800;line-height:1.2}
 </style>
 
 <header class="hdr">
@@ -904,6 +907,7 @@ html[data-theme="light"] .up-card{background:linear-gradient(180deg,#fff4e8,#fff
     <a href="#commande" class="btn btn-ghost cart-btn" aria-label="Panier">🛒 <b id="cartCount"></b></a>
     <a href="#commande" class="btn btn-main" data-i18n="cta_order"></a>
     <button type="button" class="icon-btn menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false"><i></i><i></i><i></i></button>
+    <a href="mise-a-jour/" class="icon-btn up-btn" aria-label="Mise à jour"><span>⬇️</span><small data-i18n="up_short"></small></a>
   </div>
 </header>
 <div class="mnav" id="mnav" hidden>
@@ -914,7 +918,6 @@ html[data-theme="light"] .up-card{background:linear-gradient(180deg,#fff4e8,#fff
     <a href="#produits" data-m data-goto="remote"><span>🎮</span><b data-i18n="mn_remote"></b></a>
     <a href="#abonnements" data-m><span>📡</span><b data-i18n="mn_plans"></b></a>
     <a href="#abonnements" data-m data-renew="promax_silver"><b data-i18n="tab_renew"></b></a>
-    <a href="mise-a-jour/" data-m><span>⬇️</span><b data-i18n="mn_up"></b></a>
     <button type="button" data-m data-rule="team"><span>👥</span><b data-i18n="mn_team"></b></button>
     <button type="button" data-m data-rule="partner"><span>🤝</span><b data-i18n="at_pt"></b></button>
     <a href="#magasins" data-m><span>📍</span><b data-i18n="nav_stores"></b></a>
@@ -975,7 +978,7 @@ html[data-theme="light"] .up-card{background:linear-gradient(180deg,#fff4e8,#fff
     </div>
   </section>
 
-  <!-- v9.40 : RENOUVELLEMENT bien visuel -->
+  <!-- v9.41 : RENOUVELLEMENT bien visuel -->
   <section class="rx" id="renouveler">
     <div class="wrap">
       <div class="rx-card">
@@ -1004,7 +1007,7 @@ html[data-theme="light"] .up-card{background:linear-gradient(180deg,#fff4e8,#fff
     </div>
   </section>
 
-  <!-- v9.40 : MISE À JOUR Atom Pro Max 3 (Downloader) -->
+  <!-- v9.41 : MISE À JOUR Atom Pro Max 3 (Downloader) -->
   <section class="up" id="mise-a-jour">
     <div class="wrap">
       <div class="up-card">
@@ -1206,7 +1209,7 @@ html[data-theme="light"] .up-card{background:linear-gradient(180deg,#fff4e8,#fff
     <a class="brand" href="#top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iOCIgeTE9IjYiIHgyPSI1NyIgeTI9IjU5IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHN0b3Agc3RvcC1jb2xvcj0iIzIzM2Q2OCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzExMWQzNCIvPjwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9Im9yYml0IiB4MT0iMTMiIHkxPSIxMyIgeDI9IjUyIiB5Mj0iNTIiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBzdG9wLWNvbG9yPSIjNzVlMmI2Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2JhMGZmIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iMTkiIGZpbGw9InVybCgjYmcpIi8+CiAgPGVsbGlwc2UgY3g9IjMyIiBjeT0iMzIiIHJ4PSIyMiIgcnk9IjkuNSIgc3Ryb2tlPSJ1cmwoI29yYml0KSIgc3Ryb2tlLXdpZHRoPSIzLjIiLz4KICA8ZWxsaXBzZSBjeD0iMzIiIGN5PSIzMiIgcng9IjIyIiByeT0iOS41IiBzdHJva2U9InVybCgjb3JiaXQpIiBzdHJva2Utd2lkdGg9IjMuMiIgdHJhbnNmb3JtPSJyb3RhdGUoNjAgMzIgMzIpIi8+CiAgPGVsbGlwc2UgY3g9IjMyIiBjeT0iMzIiIHJ4PSIyMiIgcnk9IjkuNSIgc3Ryb2tlPSJ1cmwoI29yYml0KSIgc3Ryb2tlLXdpZHRoPSIzLjIiIHRyYW5zZm9ybT0icm90YXRlKDEyMCAzMiAzMikiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSI0LjIiIGZpbGw9IiNmZmYiLz4KICA8Y2lyY2xlIGN4PSI1MSIgY3k9IjIxIiByPSIzLjQiIGZpbGw9IiNmZmJiNjgiLz4KPC9zdmc+Cg==" alt="" style="width:30px;height:30px"><div>ATOM</div></a>
     <span class="num">📱 0697 60 58 94 · 0699 08 08 07</span>
     <a class="dev-sign" href="https://instagram.com/islem_atom" target="_blank" rel="noopener">Développé par <b>Islamatom</b> · 📸 @islem_atom</a>
-    <span>© 2026 ATOM <span class="v-tag">v9.40</span></span>
+    <span>© 2026 ATOM <span class="v-tag">v9.41</span></span>
     <nav class="foot-links" id="footLinks"></nav>
   </div>
 </footer>
@@ -1329,7 +1332,7 @@ const T = {
     sc_k:'ATOM · 4K ULTRA HD', sc_h:'الفخامة في علبة صغيرة', sc_p:'جهاز جزائري، جودة عالمية — من العلبة إلى شاشتك في دقيقة.',
     ch_t:'🤔 واش نختار؟', ch1:'تحب الأحدث والأسرع', ch1s:'Android 14 · Bluetooth 6.0 · الجيل الثالث', ch2:'تحب أحسن عرض', ch2s:'الجهاز + اشتراك Silver سنة مجاناً', ch3:'عندك Smart TV ولا Fire Stick', ch3s:'ما تحتاجش جهاز — غير الاشتراك', ch4:'ضاعتلك الريموت ولا تكسرت', ch4s:'ريموت ATOM أصلي بالبلوتوث',
     rx_short:'تجديد', rx_hero:'جدّد اشتراكك ATOM Pro Max', rx_hero_s:'في دقيقة — تفعيل فوري', rx_t:'تجديد الاشتراك', rx_s:'اشتراكك قرب يكمل؟ جدّدو في دقيقة ونفعّلوه فوراً.', rx_year:'/ سنة لكل جهاز', rx1:'اكتب كود الجهاز', rx2:'ادفع CCP ولا BaridiMob', rx3:'✅ يتفعّل فوراً', rx_client:'أنا زبون', rx_client_s:'جهاز واحد', rx_seller:'أنا بائع', rx_seller_s:'بزاف أجهزة', rx_name:'الاسم واللقب', rx_sname:'اسم المحل / البائع', rx_phone:'رقم الهاتف (واتساب)', rx_code:'كود الجهاز (ID / MAC)', rx_cname:'اسم الزبون (اختياري)', rx_add:'➕ زيد جهاز آخر', rx_del:'نحّي', rx_dev_n:'الجهاز', rx_pay:'🔒 الدفع بعد التأكيد — CCP · BaridiMob. ما نطلبوش بطاقة بنكية.', rx_e_code:'اكتب كود الجهاز.', rx_ok:'✅ وصلنا طلب التجديد!', rx_ok_s:'نبعثولك تفاصيل الدفع على واتساب ونفعّلو فوراً.', rx_again:'تجديد آخر', rx_opt:'اختياري',
-    up_t:'تحديث ATOM Pro Max 3', up_s:'حدّث التطبيق على البوكس تاعك في دقيقتين — بلا رابط، غير بالكود.', up_code:'كود Downloader', up_copy:'📋 نسخ', up_copied:'✅ تنسخ', up1:'افتح تطبيق Downloader في البوكس', up2:'اكتب الكود ' + '2724269' + ' واضغط Go', up3:'اضغط Install (تثبيت)', up4:'افتح ATOM Pro Max 3 — راهو محدّث ✅', up_note:'عندك مشكل؟ راسلنا على واتساب ونعاونوك خطوة بخطوة 💬', ap_t:'❓ ما عندكش Downloader في البوكس؟ نزّلو أولاً من Aptoide:', ap1:'افتح تطبيق Aptoide في البوكس', ap2:'في البحث اكتب Downloader', ap3:'اضغط Install — ومن بعد ارجع للخطوة 1 فوق ☝️', mn_up:'التحديثات',
+    up_t:'تحديث ATOM Pro Max 3', up_s:'حدّث التطبيق على البوكس تاعك في دقيقتين — بلا رابط، غير بالكود.', up_code:'كود Downloader', up_copy:'📋 نسخ', up_copied:'✅ تنسخ', up1:'افتح تطبيق Downloader في البوكس', up2:'اكتب الكود ' + '2724269' + ' واضغط Go', up3:'اضغط Install (تثبيت)', up4:'افتح ATOM Pro Max 3 — راهو محدّث ✅', up_note:'عندك مشكل؟ راسلنا على واتساب ونعاونوك خطوة بخطوة 💬', ap_t:'❓ ما عندكش Downloader في البوكس؟ نزّلو أولاً من Aptoide:', ap1:'افتح تطبيق Aptoide في البوكس', ap2:'في البحث اكتب Downloader', ap3:'اضغط Install — ومن بعد ارجع للخطوة 1 فوق ☝️', mn_up:'التحديثات', up_short:'تحديث',
     mn_new:'الجديد', mn_remote:'ريموت ATOM الذكي', mn_plans:'الاشتراكات ATOM Pro Max', mn_team:'فريق ATOM',
     pick_t:'اختر منتجك', pick_go:'اطلب الآن 🛒', pick_note:'✅ الأجهزة: دفع عند الاستلام | 🚚 توصيل لجميع الولايات | 🔒 بدون بطاقة بنكية', co_title:'إتمام الطلب', co_back:'→ رجوع', per_year:'/ سنة',
     f_title:'بيانات الطلب', f_sub:'نحتاج فقط لاسمك ورقم هاتفك وولايتك.', f_name:'الاسم واللقب', f_phone:'رقم الهاتف', f_wilaya:'الولاية', f_commune:'البلدية', f_address:'العنوان (اختياري)', f_note:'ملاحظة (اختياري)', f_choose:'اختر ولايتك',
@@ -1402,7 +1405,7 @@ const T = {
     sc_k:'ATOM · 4K ULTRA HD', sc_h:'Le luxe dans une petite boîte', sc_p:'Une marque algérienne, une qualité mondiale — de la boîte à votre écran en une minute.',
     ch_t:'🤔 Lequel choisir ?', ch1:'Je veux le plus récent et rapide', ch1s:'Android 14 · Bluetooth 6.0 · 3ᵉ génération', ch2:'Je veux la meilleure offre', ch2s:'Le boîtier + 1 an de Silver offert', ch3:'J’ai une Smart TV ou un Fire Stick', ch3s:'Pas besoin de boîtier — juste l’abonnement', ch4:'J’ai perdu ou cassé ma télécommande', ch4s:'Télécommande ATOM d’origine Bluetooth',
     rx_short:'Renouveler', rx_hero:'Renouveler ATOM Pro Max', rx_hero_s:'En une minute — activation immédiate', rx_t:'Renouvellement', rx_s:'Votre abonnement se termine ? Renouvelez en une minute, activation immédiate.', rx_year:'/ an par appareil', rx1:'Tapez le code de l’appareil', rx2:'Payez par CCP ou BaridiMob', rx3:'✅ Activé tout de suite', rx_client:'Je suis client', rx_client_s:'1 appareil', rx_seller:'Je suis vendeur', rx_seller_s:'plusieurs appareils', rx_name:'Nom et prénom', rx_sname:'Nom du magasin / vendeur', rx_phone:'Téléphone (WhatsApp)', rx_code:'Code de l’appareil (ID / MAC)', rx_cname:'Nom du client (facultatif)', rx_add:'➕ Ajouter un appareil', rx_del:'Retirer', rx_dev_n:'Appareil', rx_pay:'🔒 Paiement après confirmation — CCP · BaridiMob. Jamais de carte bancaire.', rx_e_code:'Tapez le code de l’appareil.', rx_ok:'✅ Demande de renouvellement reçue !', rx_ok_s:'On vous envoie le paiement sur WhatsApp et on active tout de suite.', rx_again:'Autre renouvellement', rx_opt:'facultatif',
-    up_t:'Mise à jour ATOM Pro Max 3', up_s:'Mettez l’app à jour sur votre boîtier en 2 minutes — sans lien, juste avec le code.', up_code:'Code Downloader', up_copy:'📋 Copier', up_copied:'✅ Copié', up1:'Ouvrez l’app Downloader sur le boîtier', up2:'Tapez le code 2724269 et appuyez sur Go', up3:'Appuyez sur Install', up4:'Ouvrez ATOM Pro Max 3 — c’est à jour ✅', up_note:'Un souci ? Écrivez-nous sur WhatsApp, on vous aide pas à pas 💬', ap_t:'❓ Pas de Downloader sur le boîtier ? Installez-le d’abord avec Aptoide :', ap1:'Ouvrez l’app Aptoide sur le boîtier', ap2:'Dans la recherche, tapez Downloader', ap3:'Appuyez sur Install — puis revenez à l’étape 1 ☝️', mn_up:'Mises à jour',
+    up_t:'Mise à jour ATOM Pro Max 3', up_s:'Mettez l’app à jour sur votre boîtier en 2 minutes — sans lien, juste avec le code.', up_code:'Code Downloader', up_copy:'📋 Copier', up_copied:'✅ Copié', up1:'Ouvrez l’app Downloader sur le boîtier', up2:'Tapez le code 2724269 et appuyez sur Go', up3:'Appuyez sur Install', up4:'Ouvrez ATOM Pro Max 3 — c’est à jour ✅', up_note:'Un souci ? Écrivez-nous sur WhatsApp, on vous aide pas à pas 💬', ap_t:'❓ Pas de Downloader sur le boîtier ? Installez-le d’abord avec Aptoide :', ap1:'Ouvrez l’app Aptoide sur le boîtier', ap2:'Dans la recherche, tapez Downloader', ap3:'Appuyez sur Install — puis revenez à l’étape 1 ☝️', mn_up:'Mises à jour', up_short:'MAJ',
     mn_new:'Nouveau', mn_remote:'Télécommande ATOM', mn_plans:'Abonnements ATOM Pro Max', mn_team:'Équipe ATOM',
     pick_t:'Choisissez votre produit', pick_go:'Commander 🛒', pick_note:'✅ Boîtiers : paiement à la livraison | 🚚 Livraison 58 wilayas | 🔒 Sans carte bancaire', co_title:'Finaliser la commande', co_back:'← Retour', per_year:'/ an',
     f_title:'Informations de commande', f_sub:'Juste votre nom, votre téléphone et votre wilaya.', f_name:'Nom et prénom', f_phone:'Téléphone', f_wilaya:'Wilaya', f_commune:'Commune', f_address:'Adresse (facultatif)', f_note:'Remarque (facultatif)', f_choose:'Choisissez votre wilaya',
@@ -1816,7 +1819,7 @@ document.getElementById('atmosBot').addEventListener('click', () => { if (atmosP
 atmosBubble.addEventListener('click', () => atmosToggle(true));
 document.getElementById('atmosClose').addEventListener('click', () => atmosToggle(false));
 atmosPanel.addEventListener('click', e => { if (e.target.closest('a,button[data-add]')) setTimeout(() => atmosToggle(false), 150); });
-/* v9.40 : plus d'ouverture automatique du robot */
+/* v9.41 : plus d'ouverture automatique du robot */
 
 /* ---------- entrée cinéma + le stick qui s'approche au scroll ---------- */
 (function heroIntro(){
@@ -1844,9 +1847,9 @@ atmosPanel.addEventListener('click', e => { if (e.target.closest('a,button[data-
 })();
 
 
-/* ===================== PANEL DES COMMANDES (v9.40) ===================== */
+/* ===================== PANEL DES COMMANDES (v9.41) ===================== */
 
-/* ---------- renouvellement de l'abonnement (v9.40) ---------- */
+/* ---------- renouvellement de l'abonnement (v9.41) ---------- */
 function openRenew(key){
   const opts = ['promax_silver'].map(k => `<label><input type="radio" name="rk" value="${k}" ${k === key ? 'checked' : ''}><span><b>${nameOf(k)}</b><em class="num">${fmt(priceOf(k))} ${t('year')}</em></span></label>`).join('');
   openSheet(sheetHead(t('rn_title')) + `<p>${t('rn_sub')}</p>
@@ -2194,7 +2197,7 @@ if (LIVE) {
 
 
 
-  /* ---------- v9.40 : la télécommande ---------- */
+  /* ---------- v9.41 : la télécommande ---------- */
   const remoteTex = canvasTex(1400, 360, (g, w, h) => {
     g.fillStyle = '#0c0d10'; g.fillRect(0, 0, w, h);
     const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(255,255,255,.08)'); gr.addColorStop(0.5, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
@@ -2219,7 +2222,7 @@ if (LIVE) {
   const rLed = mesh(new T3.BoxGeometry(0.08, 0.02, 0.08), M.led, -4.05, 0.29, 0.75); remote.add(rLed);
   remote.position.set(0.4, -0.15, -4.3);
 
-  /* ---------- v9.40 : effets animés ---------- */
+  /* ---------- v9.41 : effets animés ---------- */
   const sweep = mesh(new T3.PlaneGeometry(0.35, 2.3), new T3.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, blending: T3.AdditiveBlending, depthWrite: false }), 0, 0.645, 0);
   sweep.rotation.set(-Math.PI / 2, 0, 0); top.add(sweep);
   const ring = mesh(new T3.RingGeometry(0.92, 1, 96), new T3.MeshBasicMaterial({ color: 0x00c8dc, transparent: true, opacity: 0, blending: T3.AdditiveBlending, depthWrite: false, side: T3.DoubleSide }), 0, pool.position.y + 0.02, 0);
@@ -2354,7 +2357,7 @@ if (LIVE) {
 </script>
 
 
-<script>/* ===== v9.40 : commande comme atomdz.com ===== */
+<script>/* ===== v9.41 : commande comme atomdz.com ===== */
 const PICK = [['atom_s3','📺'],['atom_s2','📺'],['remote','🎮'],['promax_silver','📡']];
 function renderPick(){
   const box = document.getElementById('pickList'); if (!box) return;
@@ -2391,7 +2394,7 @@ document.addEventListener('click', e => {
 })();
 </script>
 
-<script>/* ===== v9.40 : menu ☰ ===== */
+<script>/* ===== v9.41 : menu ☰ ===== */
 (function(){
   const nav = document.getElementById('mnav'), btn = document.getElementById('menuBtn');
   const open = o => { nav.hidden = !o; btn.setAttribute('aria-expanded', o); btn.classList.toggle('on', o); document.body.classList.toggle('m-open', o); };
@@ -2406,13 +2409,13 @@ document.addEventListener('click', e => {
 })();
 </script>
 
-<script>/* ===== v9.40 : photo en plein écran ===== */
+<script>/* ===== v9.41 : photo en plein écran ===== */
 document.addEventListener('click', e => {
   const m = e.target.closest('.gal-main'); if (m) { const v = document.createElement('div'); v.className = 'zoom'; v.innerHTML = '<img alt="">' + '<button type="button" aria-label="×">×</button>'; v.firstChild.src = m.src; v.addEventListener('click', () => v.remove()); document.body.appendChild(v); }
 });
 </script>
 
-<script>/* ===== v9.40 : changer le code du panel ===== */
+<script>/* ===== v9.41 : changer le code du panel ===== */
 (function(){
   const T = { ar:{ t:'🔑 تغيير الرمز السري', o:'الرمز الحالي', n:'الرمز الجديد', c:'أعد كتابة الرمز الجديد', go:'حفظ الرمز الجديد', no:'إلغاء', len:'الرمز لازم يكون {n} أرقام.', same:'الرمزين الجداد ماشي كيف كيف.', bad:'الرمز الحالي غالط.', ok:'✅ تبدّل الرمز! من دابا استعمل الرمز الجديد.' },
               fr:{ t:'🔑 Changer le code secret', o:'Code actuel', n:'Nouveau code', c:'Retapez le nouveau code', go:'Enregistrer le nouveau code', no:'Annuler', len:'Le code doit avoir {n} chiffres.', same:'Les deux nouveaux codes ne sont pas pareils.', bad:'Le code actuel est faux.', ok:'✅ Code changé ! Utilisez le nouveau code à partir de maintenant.' } };
@@ -2437,7 +2440,7 @@ document.addEventListener('click', e => {
 })();
 </script>
 
-<script>/* ===== v9.40 : renouvellement client / vendeur ===== */
+<script>/* ===== v9.41 : renouvellement client / vendeur ===== */
 const RX = { who: 'client', rows: [{ code: '', cname: '' }] };
 const RX_MAX = 10;
 function rxUnit(){ return priceOf('promax_silver') || 8500; }
@@ -2487,7 +2490,7 @@ new MutationObserver(rxPaint).observe(document.documentElement, { attributes: tr
 rxPaint();
 </script>
 
-<script>/* ===== v9.40 : liens partagés (#partenaire, #telecommande…) ===== */
+<script>/* ===== v9.41 : liens partagés (#partenaire, #telecommande…) ===== */
 addEventListener('load', () => setTimeout(() => {
   const h = location.hash.slice(1);
   if (h === 'partenaire') { const R = RULES[lang].partner; openSheet(sheetHead(R[0]) + R[1]); }
@@ -2496,7 +2499,7 @@ addEventListener('load', () => setTimeout(() => {
 }, 400));
 </script>
 
-<script>/* ===== v9.40 : bouton rouge de la télécommande = entrée du panel ===== */
+<script>/* ===== v9.41 : bouton rouge de la télécommande = entrée du panel ===== */
 (function(){
   const hidden = document.createElement('button'); hidden.id = 'secretBtn'; hidden.type = 'button'; hidden.hidden = true; document.body.appendChild(hidden);
   const img = document.querySelector('.hero-photo'); if (!img) return;
@@ -2508,7 +2511,7 @@ addEventListener('load', () => setTimeout(() => {
 })();
 </script>
 
-<script>/* v9.40 : copier le code Downloader */
+<script>/* v9.41 : copier le code Downloader */
 document.addEventListener('click', e => { const b = e.target.closest('[data-copy]'); if (!b) return; try { navigator.clipboard.writeText(b.dataset.copy); } catch (x) {} b.textContent = t('up_copied'); setTimeout(() => { b.textContent = t('up_copy'); }, 1800); });
 </script>
 </body></html>
