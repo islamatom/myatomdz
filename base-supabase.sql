@@ -204,3 +204,14 @@ begin
 end $$;
 grant execute on function submit_eu_order(text,text,text,text,text,text,jsonb,integer,text) to anon;
 -- (le panel reconnaît les commandes Europe par « 🇪🇺 » dans le pays : panel_orders inchangé)
+
+-- ---------- v9.43 : frais de livraison modifiables depuis le panel ----------
+create or replace function panel_set_fee(p_code text, p_id uuid, p_fee integer) returns boolean
+language plpgsql security definer set search_path = public as $$
+declare f int := greatest(0, least(100000, coalesce(p_fee, 0)));
+begin
+  if not panel_check(p_code) then return false; end if;
+  update site_orders set total_da = total_da - coalesce(ship_fee, 0) + f, ship_fee = f, ship_type = coalesce(ship_type, 'home') where id = p_id;
+  return true;
+end $$;
+grant execute on function panel_set_fee(text,uuid,integer) to anon;
