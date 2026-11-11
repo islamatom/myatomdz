@@ -1945,6 +1945,8 @@ const PanelStore = (() => {
 
 let pnPeriod = 3, pnFilter = 'all', pnQuery = '', pnTimer = 0, pnKnown = new Set(), pnSure = '';
 const pnFmt = n => new Intl.NumberFormat('en-US').format(Math.round(n)) + ' DA';
+const pnEU = o => o.cur === 'EUR' || String(o.wilaya || '').startsWith('🇪🇺');
+const pnMoney = (o, n) => pnEU(o) ? new Intl.NumberFormat('fr-BE').format(n) + ' €' : pnFmt(n);
 const pnEsc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 function pnWhen(iso){ const d = new Date(iso), m = Math.round((Date.now() - d) / 60000); if (lang === 'ar') return m < 60 ? `منذ ${Math.max(1, m)} د` : m < 1440 ? `منذ ${Math.round(m / 60)} سا` : d.toLocaleDateString('fr-DZ'); return m < 60 ? `il y a ${Math.max(1, m)} min` : m < 1440 ? `il y a ${Math.round(m / 60)} h` : d.toLocaleDateString('fr-BE'); }
 function pnInPeriod(o){ if (pnPeriod === 3) return true; const d = new Date(o.date), n = new Date(); if (pnPeriod === 0) return d.toDateString() === n.toDateString(); return Date.now() - d < (pnPeriod === 1 ? 7 : 30) * 864e5; }
@@ -1957,7 +1959,7 @@ async function pnRender(){
   const shown = inP.filter(o => (pnFilter === 'all' || o.status === pnFilter) && (!q || (o.name + o.phone + o.no).toLowerCase().replace(/\s/g, '').includes(q)));
   document.getElementById('pnDemo').textContent = LIVE ? '' : pt('demo');
   document.getElementById('pnPeriod').innerHTML = pt('periods').map((p, i) => `<button type="button" data-pnp="${i}" aria-pressed="${i === pnPeriod}">${p}</button>`).join('');
-  const money = inP.filter(o => o.status === 'confirmed' || o.status === 'delivered').reduce((s, o) => s + o.total, 0);
+  const money = inP.filter(o => !pnEU(o) && (o.status === 'confirmed' || o.status === 'delivered')).reduce((s, o) => s + o.total, 0);
   document.getElementById('pnStats').innerHTML = [[pt('orders'), inP.length], [pt('fresh'), inP.filter(o => o.status === 'new').length], [pt('conf'), inP.filter(o => o.status === 'confirmed').length], [pt('money'), pnFmt(money), 'money']]
     .map(([l, v, c]) => `<div class="pn-stat ${c || ''}"><small>${l}</small><b class="num">${v}</b></div>`).join('');
   document.getElementById('pnSearch').placeholder = pt('search');
@@ -1972,11 +1974,11 @@ async function pnRender(){
       <div class="pn-acts"><a class="pn-call" href="tel:${pnEsc(o.phone)}">${pt('call')}</a><a class="pn-wa" href="${pnWa(o)}" target="_blank" rel="noopener">${pt('wa')}</a><button type="button" class="pn-copy" data-pncopy="${pnEsc(o.phone)}">${pt('copy')}</button></div>
       ${o.wilaya === '—' ? '' : `<p class="pn-where">📍 ${pnEsc(o.wilaya)}${o.commune ? ' · ' + pnEsc(o.commune) : ''}${o.address ? ' · ' + pnEsc(o.address) : ''}</p>`}
       ${o.phone2 ? `<p class="pn-where">📱 2ᵉ : <span class="num">${pnEsc(o.phone2)}</span></p>` : ''}
-      ${o.ship ? `<p class="pn-where">${o.ship === 'office' ? '🏢 ' + t('ship_office') : '🏠 ' + t('ship_home')} · <span class="num">${pnFmt(o.fee || 0)}</span></p>` : ''}
+      ${o.ship ? `<p class="pn-where">${o.ship === 'office' ? '🏢 ' + t('ship_office') : '🏠 ' + t('ship_home')} · <span class="num">${pnMoney(o, o.fee || 0)}</span></p>` : ''}
       ${o.device ? `<p class="pn-where">📡 ${o.device === 'box' ? t('dev_box') : t('dev_other')}</p>` : ''}
       <p class="pn-items">${o.items.map(x => `<b>${x.qty} ×</b> ${pnEsc(x.name)}`).join(' · ')}</p>
       ${o.note ? `<p class="pn-note">📝 ${pnEsc(o.note)}</p>` : ''}
-      <div class="pn-total"><span>${pt('total')}</span><b class="num">${pnFmt(o.total)}</b></div>
+      <div class="pn-total"><span>${pt('total')}</span><b class="num">${pnMoney(o, o.total)}</b></div>
       <div class="pn-st">${PN_ST.map(x => `<button type="button" data-pns="${x.key}" data-id="${o.id}" aria-pressed="${o.status === x.key}" style="--bg:${x.bg};--fg:${x.fg};--dot:${x.dot}">${x[lang]}</button>`).join('')}</div>
       <div class="pn-foot"><span>${o.changed ? pt('by') + ' · ' + pnWhen(o.changed) : ''}</span><button type="button" class="pn-del${pnSure === o.id ? ' sure' : ''}" data-pndel="${o.id}">${pnSure === o.id ? pt('sure') : pt('del')}</button></div>
     </article>`; }).join('') : `<p class="pn-empty">${pt('none')}</p>`;

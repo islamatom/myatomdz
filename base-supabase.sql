@@ -166,3 +166,41 @@ begin
   return true;
 end $$;
 grant execute on function panel_change_code(text,text) to anon;
+
+-- ---------- v9.42 : portail Europe (atomdz.com/eu) ----------
+alter table site_orders add column if not exists currency text not null default 'DA';
+create table if not exists site_catalog_eu (key text primary key, name text not null, price_eur integer not null check (price_eur >= 0), sort_order int not null default 0, active boolean not null default true);
+insert into site_catalog_eu (key, name, price_eur, sort_order) values
+  ('eu_s3','ATOM S3',99,1), ('eu_s2','ATOM S2',89,2), ('eu_ax4','ATOM AX4',109,3), ('eu_m10','ATOM M10',119,4)
+on conflict (key) do update set price_eur = excluded.price_eur, name = excluded.name;
+alter table site_catalog_eu enable row level security;
+drop policy if exists "catalogue eu visible" on site_catalog_eu;
+create policy "catalogue eu visible" on site_catalog_eu for select to anon using (active);
+grant select on site_catalog_eu to anon;
+
+create or replace function submit_eu_order(p_name text, p_phone text, p_country text, p_city text, p_zip text, p_address text, p_items jsonb, p_ship integer default 0, p_email text default null)
+returns json language plpgsql security definer set search_path = public as $$
+declare it jsonb; c site_catalog_eu; lines jsonb := '[]'::jsonb; sub int := 0; q int; fee int; o site_orders; ph text;
+begin
+  ph := regexp_replace(coalesce(p_phone,''), '[^0-9+]', '', 'g');
+  if length(trim(coalesce(p_name,''))) < 2 then raise exception 'name'; end if;
+  if ph !~ '^\+?[0-9]{8,15}$' then raise exception 'phone'; end if;
+  if coalesce(p_country,'') = '' or coalesce(p_address,'') = '' then raise exception 'address'; end if;
+  if (select count(*) from site_orders where phone = ph and created_at > now() - interval '1 hour') >= 3 then raise exception 'too many orders'; end if;
+  for it in select * from jsonb_array_elements(coalesce(p_items,'[]'::jsonb)) loop
+    select * into c from site_catalog_eu where key = it->>'key' and active;
+    if not found then continue; end if;
+    q := greatest(1, least(10, coalesce((it->>'qty')::int, 1)));
+    lines := lines || jsonb_build_object('key', c.key, 'name', c.name, 'qty', q, 'price', c.price_eur);
+    sub := sub + c.price_eur * q;
+  end loop;
+  if jsonb_array_length(lines) = 0 then raise exception 'empty'; end if;
+  fee := greatest(0, least(50, coalesce(p_ship,0)));
+  insert into site_orders (name, phone, wilaya, commune, address, note, items, ship_type, ship_fee, total_da, currency)
+  values (left(trim(p_name),80), left(ph,16), '🇪🇺 ' || left(p_country,40), left(p_city,60), left(coalesce(p_zip,'') || ' ' || p_address,200),
+          nullif('💳 SumUp' || coalesce(' · ' || left(p_email,80),''),''), lines, 'home', fee, sub + fee, 'EUR')
+  returning * into o;
+  return json_build_object('order_no', o.order_no, 'total', o.total_da);
+end $$;
+grant execute on function submit_eu_order(text,text,text,text,text,text,jsonb,integer,text) to anon;
+-- (le panel reconnaît les commandes Europe par « 🇪🇺 » dans le pays : panel_orders inchangé)
