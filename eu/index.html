@@ -43,18 +43,36 @@ button,a,input,select{touch-action:manipulation;font:inherit}input,select{font-s
 .err{color:#ff6b7a;font-weight:700;margin:6px 0}.pay{text-align:center;font-size:13px;color:var(--muted);margin:10px 0 0}
 .done{text-align:center;padding:20px 0}.done .big{font-size:56px}.done .no{display:inline-block;padding:8px 18px;border-radius:12px;background:#00c8dc22;font-weight:800;font-size:20px;margin:8px 0}
 .wa{display:block;text-align:center;padding:15px;border-radius:50px;background:#25d366;color:#fff;font-weight:800;text-decoration:none;margin-top:12px}
+.p{border:1.5px solid var(--line)}.p:active{transform:scale(.98)}
+.pv[hidden],.home[hidden]{display:none}
+.back{display:inline-flex;align-items:center;gap:6px;margin:14px 0 4px;padding:9px 14px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--text);font-weight:700}
+.gl{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;border-radius:22px;background:radial-gradient(circle at 50% 40%,#16305e,#050a1a 75%);scrollbar-width:none;margin-top:10px}.gl::-webkit-scrollbar{display:none}
+.gl>*{flex:0 0 100%;aspect-ratio:1;scroll-snap-align:center;display:grid;place-items:center;font-size:90px}.gl img{width:100%;height:100%;object-fit:cover}
+.th{display:flex;gap:8px;margin:10px 0 0;overflow-x:auto}.th button{flex:0 0 62px;height:62px;border-radius:12px;overflow:hidden;border:2px solid var(--line);padding:0;background:var(--card)}.th button.on{border-color:var(--mint)}.th img{width:100%;height:100%;object-fit:cover}
+.pt{margin:16px 0 2px;font-size:28px;line-height:1.15}.pp{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.pp b{font-size:32px;color:var(--mint)}.pp span{font-weight:700;color:var(--muted);font-size:13px}
+.specs{list-style:none;padding:0;margin:14px 0;display:grid;gap:8px}.specs li{display:flex;gap:10px;align-items:center;padding:11px 13px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-weight:700;font-size:14px}.specs li::before{content:'✓';color:var(--mint);font-weight:800}
+.inbox{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}.inbox span{font-size:12px;font-weight:700;padding:6px 10px;border-radius:99px;background:#00c8dc1f;color:var(--mint)}
+.sug h2{font-size:20px;margin:26px 0 10px}.sg{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}.sg .p{flex:0 0 44%;scroll-snap-align:start}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}footer a{color:var(--muted)}
 </style>
 </head>
 <body>
 <header class="hdr"><div class="logo">AT<i>✻</i>M</div><button class="ib" id="th" type="button" aria-label="Jour / nuit">☀️</button></header>
 <main class="wrap">
+  <div class="home" id="home">
   <section class="hero"><h1>Boîtiers <em>Android TV 4K</em></h1><p>Choisissez votre boîtier, remplissez le formulaire : on vous envoie le lien de paiement sécurisé SumUp sur WhatsApp.</p></section>
   <div class="trust"><div>🚚 Livraison dans toute l'Europe</div><div>💳 Paiement sécurisé SumUp</div><div>🧾 Prix TVA comprise</div><div>🛡️ Garantie 1 an</div><div>💬 Support WhatsApp</div></div>
-  <h2 style="margin:20px 0 0">1. Choisissez votre boîtier</h2>
+  <h2 style="margin:20px 0 0">Choisissez votre boîtier</h2>
   <div class="grid" id="grid"></div>
-  <form class="box" id="f" novalidate>
-    <h2>2. Vos informations</h2>
+  </div>
+  <div class="pv" id="pv" hidden>
+  <button class="back" type="button" id="back">← Tous les modèles</button>
+  <div class="gl" id="gl"></div><div class="th" id="thb"></div>
+  <h1 class="pt" id="pt"></h1><div class="pp"><b id="ppr"></b><span>TVA comprise · livraison dans toute l'Europe</span></div>
+  <ul class="specs" id="specs"></ul><div class="inbox" id="inb"></div>
+  <button class="go" type="button" id="buy">Commander ce modèle</button>
+  <form class="box" id="f" novalidate hidden>
+    <h2>Vos informations</h2>
     <div class="f"><span>Quantité</span><div class="qty"><button type="button" data-q="-1">−</button><b id="q">1</b><button type="button" data-q="1">+</button></div></div>
     <label class="f"><span>Nom et prénom <i>*</i></span><input name="name" autocomplete="name" required maxlength="80"></label>
     <label class="f"><span>Téléphone / WhatsApp <i>*</i></span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+32 4XX XX XX XX" required maxlength="20" dir="ltr"></label>
@@ -68,6 +86,8 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}f
     <p class="pay">🧾 Tous les prix sont TVA comprise (TVAC). 🔒 Aucune carte demandée ici. Vous payez ensuite par le lien SumUp envoyé sur WhatsApp.</p>
   </form>
   <div class="box done" id="done" hidden></div>
+  <section class="sug"><h2>Vous aimerez aussi</h2><div class="sg" id="sg"></div></section>
+  </div>
 </main>
 <footer>© 2026 ATOM · <a href="https://instagram.com/islem_atom" target="_blank" rel="noopener">Développé par Islamatom</a></footer>
 <script>
@@ -75,27 +95,53 @@ const CONFIG = { url: 'https://zgwdjbliabxablrianko.supabase.co', key: 'eyJhbGci
 const SHIP = null; // frais fixes en € (null = à confirmer)
 const WA = '32499374830';
 let PRODUCTS = [
-  { key:'eu_s3', name:'ATOM S3', price:99, img:'img/s3.jpg', desc:'3ᵉ génération · Android 14 · Wi-Fi 6 · BT 6.0' },
-  { key:'eu_s2', name:'ATOM S2', price:89, img:'img/s2.jpg', desc:'4K HDR · Dolby Atmos · Wi-Fi 6' },
-  { key:'eu_ax4', name:'ATOM AX4 Ultra', price:109, img:'img/ax4-1.jpg', imgs:['img/ax4-1.jpg','img/ax4-2.jpg','img/ax4-3.jpg','img/ax4-4.jpg'], desc:'Amlogic S905X4 · 4 Go DDR4 · 64 Go · Wi-Fi 5G · HDMI 2.1' },
-  { key:'eu_m10', name:'ATOM M10', price:119, img:'', desc:'Boîtier Android TV 4K' },
-  { key:'eu_inferno', name:'Mutant Inferno ProMax', price:99, img:'img/inferno.jpg', desc:'8K · Amlogic S905X3 · 4 Go DDR4 · 32 Go · Wi-Fi 2,4/5 GHz · Bluetooth' },
-];
+  { key:'eu_s3', slug:'s3', name:'ATOM S3', price:99, imgs:['img/s3.jpg','img/s3-1.jpg','img/s3-2.jpg','img/s3-3.jpg'], desc:'3ᵉ génération · Android 14 · Wi-Fi 6 · BT 6.0',
+    specs:['Processeur S905Y4 quatre cœurs (le plus récent)','Android 14','4K Ultra HD · HDR','Wi-Fi 6 · Bluetooth 6.0','HDMI'] },
+  { key:'eu_s2', slug:'s2', name:'ATOM S2', price:89, imgs:['img/s2.jpg','img/s2-1.jpg','img/s2-2.jpg','img/s2-3.jpg','img/s2-4.jpg'], desc:'4K HDR · Dolby Atmos · Wi-Fi 6',
+    specs:['4K HDR','Android 13','Dolby Atmos','Wi-Fi 6'] },
+  { key:'eu_ax4', slug:'ax4', name:'ATOM AX4 Ultra', price:109, imgs:['img/ax4-1.jpg','img/ax4-2.jpg','img/ax4-3.jpg','img/ax4-4.jpg'], desc:'Amlogic S905X4 · 4 Go DDR4 · 64 Go · Wi-Fi 5G · HDMI 2.1',
+    specs:['Processeur Amlogic S905X4','4 Go de RAM DDR4','64 Go de stockage','Wi-Fi 5 GHz','HDMI 2.1'] },
+  { key:'eu_m10', slug:'m10', name:'ATOM M10', price:119, imgs:[], desc:'Boîtier Android TV 4K', specs:['Boîtier Android TV 4K'] },
+  { key:'eu_inferno', slug:'inferno', name:'Mutant Inferno ProMax', price:99, imgs:['img/inferno.jpg'], desc:'8K · Amlogic S905X3 · 4 Go DDR4 · 32 Go · Wi-Fi 2,4/5 GHz · Bluetooth',
+    specs:['Image jusqu\'à 8K','Processeur Amlogic S905X3 · GPU Mali-G31','4 Go de RAM DDR4 · 32 Go de stockage','Wi-Fi 2,4 / 5 GHz · Bluetooth · Ethernet','USB 3.0 + USB 2.0 · sortie optique · micro SD'] },
+  // Télécommande : prix à confirmer (price:null = cachée)
+  { key:'eu_remote', slug:'telecommande', name:'Télécommande ATOM', price:null, imgs:['img/remote-1.jpg','img/remote-2.jpg','img/remote-3.jpg'], desc:'Télécommande Bluetooth de rechange',
+    specs:['Bluetooth','Touches Netflix, YouTube, Prime Video','Compatible ATOM S3 et S2'] },
+].filter(p => p.price != null);
 const COUNTRIES = ['Belgique','France','Pays-Bas','Luxembourg','Allemagne','Espagne','Italie','Portugal','Suisse','Autriche','Irlande','Danemark','Suède','Norvège','Finlande','Pologne','Tchéquie','Grèce','Roumanie','Hongrie','Royaume-Uni','Autre pays d\'Europe'];
-let sel = 'eu_s3', qty = 1; const GI = {};
+let sel = 'eu_s3', qty = 1;
 const eurf = n => new Intl.NumberFormat('fr-BE', { style:'currency', currency:'EUR', maximumFractionDigits: n % 1 ? 2 : 0 }).format(n);
 const $ = id => document.getElementById(id);
 $('country').innerHTML = COUNTRIES.map(c => `<option>${c}</option>`).join('');
+const card = p => `<button type="button" class="p" data-k="${p.key}"><div class="im">${p.imgs[0] ? `<img src="${p.imgs[0]}" alt="${p.name}" loading="lazy">` : '📦'}</div><div class="b"><b>${p.name}</b><small>${p.desc}</small><span class="pr">${eurf(p.price)}</span><span class="tva">TVA comprise</span></div></button>`;
+$('grid').innerHTML = PRODUCTS.map(card).join('');
 function paint(){
-  $('grid').innerHTML = PRODUCTS.map(p => `<button type="button" class="p ${p.key === sel ? 'on' : ''}" data-k="${p.key}"><div class="im" ${p.imgs ? `data-gal="${p.key}"` : ''}>${p.img ? `<img src="${(p.imgs ? p.imgs[GI[p.key] || 0] : p.img)}" alt="${p.name}" loading="lazy">` : '📦'}${p.imgs ? `<span class="dots">${p.imgs.map((_, i) => `<i class="${i === (GI[p.key] || 0) ? 'on' : ''}"></i>`).join('')}</span>` : ''}</div><div class="b"><b>${p.name}</b><small>${p.desc}</small><span class="pr">${eurf(p.price)}</span><span class="tva">TVA comprise</span></div></button>`).join('');
   const p = PRODUCTS.find(x => x.key === sel); $('q').textContent = qty;
   $('sl').textContent = `${qty} × ${p.name}`; $('sp').textContent = eurf(p.price * qty);
   $('ss').textContent = SHIP == null ? 'confirmée sur WhatsApp' : eurf(SHIP);
   $('st').textContent = eurf(p.price * qty + (SHIP || 0));
 }
+function route(){
+  const p = PRODUCTS.find(x => '#' + x.slug === location.hash);
+  $('home').hidden = !!p; $('pv').hidden = !p; window.scrollTo(0, 0);
+  if (!p) return;
+  sel = p.key; qty = 1; $('f').hidden = true; $('done').hidden = true; $('buy').hidden = false;
+  const ims = p.imgs.length ? p.imgs : [''];
+  $('gl').innerHTML = ims.map(s => s ? `<div><img src="${s}" alt="${p.name}"></div>` : '<div>📦</div>').join(''); $('gl').scrollLeft = 0;
+  $('thb').innerHTML = p.imgs.length > 1 ? p.imgs.map((s, i) => `<button type="button" data-i="${i}" class="${i ? '' : 'on'}"><img src="${s}" alt=""></button>`).join('') : '';
+  $('pt').textContent = p.name; $('ppr').textContent = eurf(p.price);
+  $('specs').innerHTML = p.specs.map(s => `<li>${s}</li>`).join('');
+  $('inb').innerHTML = p.inbox ? '<span>📦 Dans la boîte :</span>' + p.inbox.map(s => `<span>${s}</span>`).join('') : '';
+  $('sg').innerHTML = PRODUCTS.filter(x => x !== p).map(card).join('');
+  document.title = p.name + ' — ATOM Europe'; paint();
+}
+$('gl').addEventListener('scroll', () => { const i = Math.round($('gl').scrollLeft / $('gl').clientWidth); document.querySelectorAll('#thb button').forEach((b, j) => b.classList.toggle('on', j === Math.abs(i))); }, { passive:true });
+window.addEventListener('hashchange', route);
 document.addEventListener('click', e => {
-  const g = e.target.closest('[data-gal]'); if (g) { const p = PRODUCTS.find(x => x.key === g.dataset.gal); GI[p.key] = ((GI[p.key] || 0) + 1) % p.imgs.length; sel = p.key; paint(); return; }
-  const c = e.target.closest('[data-k]'); if (c) { sel = c.dataset.k; paint(); $('f').scrollIntoView({ behavior:'smooth' }); }
+  const c = e.target.closest('[data-k]'); if (c) { location.hash = PRODUCTS.find(x => x.key === c.dataset.k).slug; return; }
+  const t = e.target.closest('[data-i]'); if (t) { const g = $('gl'); g.scrollTo({ left: g.clientWidth * +t.dataset.i * (document.dir === 'rtl' ? -1 : 1), behavior:'smooth' }); }
+  if (e.target.closest('#back')) { location.hash = ''; }
+  if (e.target.closest('#buy')) { $('buy').hidden = true; $('f').hidden = false; $('f').scrollIntoView({ behavior:'smooth' }); }
   const q = e.target.closest('[data-q]'); if (q) { qty = Math.max(1, Math.min(10, qty + +q.dataset.q)); paint(); }
   if (e.target.closest('#th')) { const t = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; document.documentElement.dataset.theme = t; try { localStorage.setItem('atom-theme', t); } catch (x) {} }
 });
@@ -118,7 +164,7 @@ $('f').addEventListener('submit', async e => {
   } catch (x) { err.textContent = 'Commande non envoyée. Vérifiez internet ou écrivez-nous sur WhatsApp.'; err.hidden = false; }
   btn.disabled = false; btn.textContent = 'Commander';
 });
-paint();
+route();
 </script>
 </body>
 </html>
