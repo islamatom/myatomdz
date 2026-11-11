@@ -12,6 +12,29 @@ const API = "https://api.sumup.com/v0.1/checkouts";
 const KEY = Deno.env.get("SUMUP_API_KEY") ?? "";
 const MERCHANT = Deno.env.get("SUMUP_MERCHANT_CODE") ?? "";
 const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+// e-mail à Atom pour chaque commande Europe (Brevo) — secrets : BREVO_API_KEY, NOTIFY_EMAIL, BREVO_SENDER
+const BREVO = Deno.env.get("BREVO_API_KEY") ?? "";
+const NOTIFY = Deno.env.get("NOTIFY_EMAIL") ?? "";
+const SENDER = Deno.env.get("BREVO_SENDER") ?? NOTIFY;
+const esc = (s: unknown) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
+async function mail(subject: string, o: Record<string, any>, extra = "") {
+  if (!BREVO || !NOTIFY) return;
+  const items = ((o.items ?? []) as { name: string; qty: number; price: number }[]).map((i) => `<li>${i.qty} × ${esc(i.name)} — ${i.price} €</li>`).join("");
+  const html = `<div style="font-family:Arial,sans-serif;font-size:15px;color:#111">${extra}
+    <h2 style="margin:0 0 8px">${esc(o.order_no)} · ${esc(o.total_da)} € TVA comprise</h2>
+    <p style="margin:0 0 6px"><b>${esc(o.name)}</b> · ${esc(o.phone)}</p>
+    <p style="margin:0 0 6px">📍 ${esc(String(o.wilaya ?? "").replace(/^🇪🇺\s*/, ""))} · ${esc(o.commune)} · ${esc(o.address)}</p>
+    <ul>${items}</ul>${o.ship_fee ? `<p>Livraison : ${esc(o.ship_fee)} €</p>` : ""}
+    <p style="color:#666">${esc(o.note)}</p>
+    <p><a href="https://atomdz.com">Ouvrir le panel</a> · <a href="https://wa.me/${String(o.phone ?? "").replace(/[^0-9]/g, "")}">WhatsApp du client</a></p></div>`;
+  try {
+    await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: { "api-key": BREVO, "Content-Type": "application/json", accept: "application/json" },
+      body: JSON.stringify({ sender: { name: "ATOM Europe", email: SENDER }, to: [{ email: NOTIFY }], subject, htmlContent: html }),
+    });
+  } catch (_) { /* l'e-mail ne doit jamais bloquer le paiement */ }
+}
 const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...CORS, "Content-Type": "application/json" } });
 
 // Demande à SumUp l'état réel du paiement, puis marque la commande payée si c'est le cas
@@ -20,8 +43,9 @@ async function sync(checkoutId: string) {
   if (!r.ok) return false;
   const c = await r.json();
   if (c.status !== "PAID") return false;
-  const { data: o } = await db.from("site_orders").select("id, note, status, paid_at").eq("sumup_id", checkoutId).maybeSingle();
+  const { data: o } = await db.from("site_orders").select("*").eq("sumup_id", checkoutId).maybeSingle();
   if (o && !o.paid_at) {
+    await mail(`✅ Payée — ${o.order_no} · ${o.total_da} € · ${o.name}`, o, `<p style="font-size:18px;color:#167a4e"><b>✅ Paiement SumUp reçu</b> — tu peux préparer le colis.</p>`);
     await db.from("site_orders").update({
       paid_at: new Date().toISOString(),
       status: o.status === "new" ? "confirmed" : o.status,
@@ -48,7 +72,7 @@ Deno.serve(async (req) => {
   const orderNo = String(body.order_no ?? "");
   const phone = String(body.phone ?? "").replace(/[^0-9+]/g, "");
   if (!/^AT-\d{1,8}$/.test(orderNo) || phone.length < 8) return json({ error: "bad" }, 400);
-  const { data: o } = await db.from("site_orders").select("id, order_no, phone, total_da, currency, paid_at, sumup_id, sumup_url, items")
+  const { data: o } = await db.from("site_orders").select("*")
     .eq("order_no", orderNo).eq("phone", phone).maybeSingle();
   if (!o || o.currency !== "EUR") return json({ error: "not_found" }, 404);
 
@@ -79,5 +103,6 @@ Deno.serve(async (req) => {
   const c = await r.json().catch(() => ({}));
   if (!r.ok || !c.hosted_checkout_url) return json({ error: "sumup", detail: c?.message ?? c?.error_code ?? r.status }, 502);
   await db.from("site_orders").update({ sumup_id: c.id, sumup_url: c.hosted_checkout_url }).eq("id", o.id);
+  await mail(`🇪🇺 Nouvelle commande ${o.order_no} · ${o.total_da} € · ${o.name}`, o, `<p style="font-size:18px"><b>🇪🇺 Nouvelle commande Europe</b> — le client est sur la page de paiement SumUp.</p>`);
   return json({ url: c.hosted_checkout_url });
 });
