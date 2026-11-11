@@ -63,6 +63,7 @@ button,a,input,select{touch-action:manipulation;font:inherit}input,select{font-s
 .show .cap b{font-size:24px;line-height:1.1;color:#fff}.show .cap span{font-size:24px;font-weight:800;color:#00e5ff;white-space:nowrap}
 .show .dt{position:absolute;top:12px;left:0;right:0;display:flex;gap:6px;justify-content:center}.show .dt i{width:22px;height:4px;border-radius:2px;background:#fff5}.show .dt i.on{background:#00e5ff}
 @media (prefers-reduced-motion:reduce){.show .sl.on img,.show .sl.on .cap>*{animation:none;opacity:1;transform:none}}
+.dlv{margin:8px 0 0;padding:10px 12px;border-radius:12px;background:#00c8dc14;border:1px solid #00c8dc40;font-size:14px;color:var(--text)}.dlv b{color:var(--mint)}
 .sug h2{font-size:20px;margin:26px 0 10px}.sg{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}.sg .p{flex:0 0 44%;scroll-snap-align:start}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}footer a{color:var(--muted)}
 </style>
@@ -79,7 +80,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}f
   <div class="pv" id="pv" hidden>
   <button class="back" type="button" id="back">← Tous les modèles</button>
   <div class="gl" id="gl"></div><div class="th" id="thb"></div>
-  <h1 class="pt" id="pt"></h1><div class="pp"><b id="ppr"></b><span>TVA comprise</span></div>
+  <h1 class="pt" id="pt"></h1><div class="pp"><b id="ppr"></b><span>TVA comprise</span></div><p class="dlv">🚚 Livraison <b id="dlvFee">9 €</b> · <b>reçue en 2 à 3 jours</b></p>
   <ul class="specs" id="specs"></ul><div class="inbox" id="inb"></div>
   <button class="go" type="button" id="buy">Commander ce modèle</button>
   <form class="box" id="f" novalidate hidden>
@@ -91,7 +92,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}f
     <label class="f"><span>Pays <i>*</i></span><select name="country" id="country" required></select></label>
     <div class="two"><label class="f"><span>Code postal <i>*</i></span><input name="zip" autocomplete="postal-code" required maxlength="12"></label><label class="f"><span>Ville <i>*</i></span><input name="city" autocomplete="address-level2" required maxlength="60"></label></div>
     <label class="f"><span>Adresse (rue et numéro) <i>*</i></span><input name="address" autocomplete="street-address" required maxlength="150"></label>
-    <div class="sum"><div><span id="sl">—</span><span id="sp">—</span></div><div><span>Livraison</span><span id="ss">—</span></div><div class="tot"><span>Total <small class="tvac">TVA comprise</small></span><b id="st">—</b></div></div>
+    <div class="sum"><div><span id="sl">—</span><span id="sp">—</span></div><div><span>Livraison <small class="tvac">2 à 3 jours</small></span><span id="ss">—</span></div><div class="tot"><span>Total <small class="tvac">TVA comprise</small></span><b id="st">—</b></div></div>
     <p class="err" id="err" hidden></p>
     <button class="go" id="go" type="submit">Commander et payer</button>
     <p class="pay">🔒 Paiement sécurisé par carte bancaire sur la page SumUp. Tous les prix sont TVA comprise.</p>
@@ -103,7 +104,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}f
 <footer>© 2026 ATOM · <a href="https://instagram.com/islem_atom" target="_blank" rel="noopener">Développé par Islamatom</a></footer>
 <script>
 const CONFIG = { url: 'https://zgwdjbliabxablrianko.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpnd2RqYmxpYWJ4YWJscmlhbmtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxNjY0NjAsImV4cCI6MjEwOTc0MjQ2MH0.bc4ML01qc2pDTP9vzJ2yTDs-uYz6Q-lY8CuyADPQT-c' };
-let SHIP = null; // frais de livraison en € (réglés dans le panel)
+let SHIP = 9; // frais de livraison en € (réglés dans le panel 🛒)
 const WA = '32499374830';
 let PRODUCTS = [
   { key:'eu_s3', slug:'s3', name:'ATOM S3', price:99, imgs:['img/s3.jpg','img/s3-1.jpg','img/s3-2.jpg','img/s3-3.jpg'], desc:'3ᵉ génération · Android 14 · Wi-Fi 6 · BT 6.0',
@@ -140,7 +141,7 @@ grid();
 function paint(){
   const p = PRODUCTS.find(x => x.key === sel); $('q').textContent = qty;
   $('sl').textContent = `${qty} × ${p.name}`; $('sp').textContent = eurf(p.price * qty);
-  $('ss').textContent = SHIP == null ? 'confirmée sur WhatsApp' : eurf(SHIP);
+  $('ss').textContent = SHIP == null ? 'confirmée sur WhatsApp' : eurf(SHIP); const df = $('dlvFee'); if (df) df.textContent = SHIP == null ? 'à confirmer' : eurf(SHIP);
   $('st').textContent = eurf(p.price * qty + (SHIP || 0));
 }
 function route(){
