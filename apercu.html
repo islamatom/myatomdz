@@ -900,6 +900,7 @@ html[data-theme="light"] .up-card{background:linear-gradient(180deg,#fff4e8,#fff
 
 /* v9.53 : dossier Europe */
 .pn-paid,.pn-unpaid{font-size:11.5px;font-weight:800;padding:2px 8px;border-radius:99px;background:#e3f7ee;color:#167a4e}.pn-unpaid{background:#fff4e0;color:#a15c00}
+.pn-chip-eu{border:2px solid #2c4fbf!important;font-weight:900}.pn-chip-eu[aria-pressed="true"]{background:#2c4fbf!important;color:#fff!important}
 .pn-chip-eu em.hot{background:#ff4d5e!important;color:#fff!important}
 /* v9.53 : code de Salima — commandes seulement */
 #pn[data-role="staff"] #pnCat,#pn[data-role="staff"] #pnKey,#pn[data-role="staff"] .pn-del{display:none!important}
@@ -1997,8 +1998,8 @@ async function pnRender(){
     .map(([l, v, c]) => `<div class="pn-stat ${c || ''}"><small>${l}</small><b class="num">${v}</b></div>`).join('');
   document.getElementById('pnSearch').placeholder = pt('search');
   document.getElementById('pnExport').textContent = pt('export');
-  document.getElementById('pnChips').innerHTML = [{ key:'all', [lang]: pt('all'), dot:'#94a3b8' }, ...PN_ST].map(s => `<button type="button" class="pn-chip" data-pnf="${s.key}" aria-pressed="${pnFilter === s.key}" style="--c:${s.dot}"><i></i>${s[lang]} <em>${s.key === 'all' ? dz.length : dz.filter(o => o.status === s.key).length}</em></button>`).join('')
-    + `<button type="button" class="pn-chip pn-chip-eu" data-pnf="eu" aria-pressed="${pnFilter === 'eu'}" style="--c:#2c4fbf"><i></i>🇪🇺 Europe <em class="${euTodo ? 'hot' : ''}">${euTodo || eu.filter(pnPaid).length}</em></button>`;
+  document.getElementById('pnChips').innerHTML = `<button type="button" class="pn-chip pn-chip-eu" data-pnf="eu" aria-pressed="${pnFilter === 'eu'}" style="--c:#2c4fbf"><i></i>🇪🇺 Europe <em class="${euTodo ? 'hot' : ''}">${euTodo || eu.filter(pnPaid).length}</em></button>` + [{ key:'all', [lang]: pt('all'), dot:'#94a3b8' }, ...PN_ST].map(s => `<button type="button" class="pn-chip" data-pnf="${s.key}" aria-pressed="${pnFilter === s.key}" style="--c:${s.dot}"><i></i>${s[lang]} <em>${s.key === 'all' ? dz.length : dz.filter(o => o.status === s.key).length}</em></button>`).join('')
+;
   document.getElementById('pnList').innerHTML = shown.length ? shown.map(o => {
     const s = pnSt(o.status);
     return `<article class="pn-card${o.fresh && !pnKnown.has(o.id) ? ' is-new' : ''}" style="--c:${s.dot}">
