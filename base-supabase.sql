@@ -430,3 +430,47 @@ begin
   return true;
 end $$;
 select 'ok' as v951;
+
+-- v9.54 : e-mail client (Europe) + bouton « Envoyée »
+alter table site_orders add column if not exists email text;
+create or replace function submit_eu_order(p_name text, p_phone text, p_country text, p_city text, p_zip text, p_address text, p_items jsonb, p_ship integer default 0, p_email text default null)
+returns json language plpgsql security definer set search_path = public as $$
+declare it jsonb; c site_catalog_eu; lines jsonb := '[]'::jsonb; sub int := 0; q int; fee int; o site_orders; ph text; sv jsonb;
+begin
+  ph := regexp_replace(coalesce(p_phone,''), '[^0-9+]', '', 'g');
+  if length(trim(coalesce(p_name,''))) < 2 then raise exception 'name'; end if;
+  if ph !~ '^\+?[0-9]{8,15}$' then raise exception 'phone'; end if;
+  if coalesce(p_country,'') = '' or coalesce(p_address,'') = '' then raise exception 'address'; end if;
+  if coalesce(p_email,'') !~ '^[^@\s]+@[^@\s]+\.[^@\s]+$' then raise exception 'email'; end if;
+  if (select count(*) from site_orders where phone = ph and created_at > now() - interval '1 hour') >= 3 then raise exception 'too many orders'; end if;
+  for it in select * from jsonb_array_elements(coalesce(p_items,'[]'::jsonb)) loop
+    select * into c from site_catalog_eu where key = it->>'key' and active;
+    if not found then continue; end if;
+    q := greatest(1, least(10, coalesce((it->>'qty')::int, 1)));
+    lines := lines || jsonb_build_object('key', c.key, 'name', c.name, 'qty', q, 'price', c.price_eur);
+    sub := sub + c.price_eur * q;
+  end loop;
+  if jsonb_array_length(lines) = 0 then raise exception 'empty'; end if;
+  select val into sv from site_settings where key = 'eu_ship';
+  fee := case when jsonb_typeof(sv) = 'number' then greatest(0, (sv)::text::int) else 0 end;
+  insert into site_orders (name, phone, wilaya, commune, address, note, items, ship_type, ship_fee, total_da, currency, email)
+  values (left(trim(p_name),80), left(ph,16), '🇪🇺 ' || left(p_country,40), left(p_city,60), left(coalesce(p_zip,'') || ' ' || p_address,200),
+          nullif('💳 SumUp' || coalesce(' · ' || left(p_email,80),''),''), lines, 'home', fee, sub + fee, 'EUR', nullif(lower(trim(coalesce(p_email,''))),''))
+  returning * into o;
+  return json_build_object('order_no', o.order_no, 'total', o.total_da);
+end $$;
+alter table site_orders add column if not exists dhd_tracking text;
+alter table site_orders add column if not exists dhd_status text;
+create or replace function panel_orders(p_code text) returns json
+language plpgsql security definer set search_path = public as $$
+declare r text := panel_role(p_code);
+begin
+  if r is null then return json_build_object('error', 'bad code'); end if;
+  return coalesce((select json_agg(json_build_object(
+    'id', id, 'no', order_no, 'date', created_at, 'status', status, 'changed', status_changed_at,
+    'name', name, 'phone', phone, 'phone2', phone2, 'wilaya', wilaya, 'commune', commune, 'address', address,
+    'note', note, 'items', items, 'ship', ship_type, 'fee', ship_fee, 'device', device, 'renew', renew, 'total', total_da, 'cur', currency,
+    'email', email, 'paid', paid_at is not null, 'dhd', dhd_tracking, 'dhd_st', dhd_status
+  ) order by created_at desc) from site_orders where not deleted), '[]'::json);
+end $$;
+select 'ok' as v954;
