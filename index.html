@@ -558,6 +558,10 @@ html[data-theme="light"] .pn-total{border-color:#0b132422}
 html[data-theme="light"] .pn-st button{border-color:#0b13241a}
 .pn-st button[aria-pressed="true"]{background:var(--bg);color:var(--fg);border-color:var(--dot)}
 .pn-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px;color:var(--muted);font-size:12px}
+.pn-dhd{margin:8px 0 0;padding:9px 11px;border-radius:12px;font-size:13px;font-weight:700;background:color-mix(in srgb,var(--c) 12%,transparent);color:var(--c);border:1px solid color-mix(in srgb,var(--c) 35%,transparent)}
+.pn-dhdgo{width:100%;margin:8px 0 0;padding:11px;border-radius:12px;border:1.5px dashed #7c3aed;background:color-mix(in srgb,#7c3aed 10%,transparent);color:#7c3aed;font-weight:800;font-size:14px}
+.pn-dhdgo.sure{border-style:solid;background:#7c3aed;color:#fff}
+.pn-dhdgo:disabled{opacity:.6}
 .pn-del{border:0;background:none;color:var(--muted);font-weight:800;font-size:13px;padding:6px}
 .pn-del.sure{color:#ef4444}
 .pn-toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:3;padding:12px 18px;border-radius:14px;background:var(--mint);color:#062a1d;font-weight:800;box-shadow:0 10px 30px #0006;white-space:nowrap}
@@ -1231,7 +1235,7 @@ html[data-theme="light"] .ce input,html[data-theme="light"] .ce textarea,html[da
     <a class="brand" href="#top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iOCIgeTE9IjYiIHgyPSI1NyIgeTI9IjU5IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHN0b3Agc3RvcC1jb2xvcj0iIzIzM2Q2OCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzExMWQzNCIvPjwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9Im9yYml0IiB4MT0iMTMiIHkxPSIxMyIgeDI9IjUyIiB5Mj0iNTIiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBzdG9wLWNvbG9yPSIjNzVlMmI2Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2JhMGZmIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iMTkiIGZpbGw9InVybCgjYmcpIi8+CiAgPGVsbGlwc2UgY3g9IjMyIiBjeT0iMzIiIHJ4PSIyMiIgcnk9IjkuNSIgc3Ryb2tlPSJ1cmwoI29yYml0KSIgc3Ryb2tlLXdpZHRoPSIzLjIiLz4KICA8ZWxsaXBzZSBjeD0iMzIiIGN5PSIzMiIgcng9IjIyIiByeT0iOS41IiBzdHJva2U9InVybCgjb3JiaXQpIiBzdHJva2Utd2lkdGg9IjMuMiIgdHJhbnNmb3JtPSJyb3RhdGUoNjAgMzIgMzIpIi8+CiAgPGVsbGlwc2UgY3g9IjMyIiBjeT0iMzIiIHJ4PSIyMiIgcnk9IjkuNSIgc3Ryb2tlPSJ1cmwoI29yYml0KSIgc3Ryb2tlLXdpZHRoPSIzLjIiIHRyYW5zZm9ybT0icm90YXRlKDEyMCAzMiAzMikiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSI0LjIiIGZpbGw9IiNmZmYiLz4KICA8Y2lyY2xlIGN4PSI1MSIgY3k9IjIxIiByPSIzLjQiIGZpbGw9IiNmZmJiNjgiLz4KPC9zdmc+Cg==" alt="" style="width:30px;height:30px"><div>ATOM</div></a>
     <span class="num">📱 0697 60 58 94 · 0699 08 08 07</span>
     <a class="dev-sign" href="https://instagram.com/islem_atom" target="_blank" rel="noopener">Développé par <b>Islamatom</b> · 📸 @islem_atom</a>
-    <span>© 2026 ATOM <span class="v-tag">v9.53</span></span>
+    <span>© 2026 ATOM <span class="v-tag">v9.55</span></span>
     <nav class="foot-links" id="footLinks"></nav>
   </div>
 </footer>
@@ -1961,6 +1965,7 @@ const PanelStore = (() => {
   return {
     setPin(c){ pin = c; },
     call(fn, body){ return rpc(fn, { p_code: pin, ...body }); },
+    ops(action, body){ return fetch(`${CONFIG.url}/api/ops.php`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ code: pin, action, ...body }) }).then(async r => { const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.message || r.status); return j; }); },
     async all(){ if (LIVE) { list = await rpc('panel_orders', { p_code: pin }); return list; } list = null; return load(); },
     async setStatus(id, st){ const o = list.find(x => x.id === id); if (!o) return; o.status = st; o.changed = new Date().toISOString(); if (LIVE) await rpc('panel_set_status', { p_code: pin, p_id: id, p_status: st }); else save(); },
     async setFee(id, n){ const o = list.find(x => x.id === id); if (!o) return; o.total = (o.total || 0) - (o.fee || 0) + n; o.fee = n; if (!o.ship) o.ship = 'home'; if (LIVE) await rpc('panel_set_fee', { p_code: pin, p_id: id, p_fee: n }); else save(); },
@@ -2015,6 +2020,7 @@ async function pnRender(){
       ${o.note ? `<p class="pn-note">📝 ${pnEsc(o.note)}</p>` : ''}
       <div class="pn-total"><span>${pt('total')}</span><b class="num">${pnMoney(o, o.total)}</b></div>
       <button type="button" class="pn-fee" data-pnfee="${o.id}">🚚 ${lang === 'fr' ? 'Frais de livraison' : 'سعر التوصيل'} : <b class="num">${pnMoney(o, o.fee || 0)}</b> — ${lang === 'fr' ? 'modifier' : 'بدّل'} ✏️</button>
+      ${pnEU(o) ? '' : pnDhdBox(o)}
       <div class="pn-st">${PN_ST.map(x => `<button type="button" data-pns="${x.key}" data-id="${o.id}" aria-pressed="${o.status === x.key}" style="--bg:${x.bg};--fg:${x.fg};--dot:${x.dot}">${x[lang]}</button>`).join('')}</div>
       <div class="pn-foot"><span>${o.changed ? pt('by') + ' · ' + pnWhen(o.changed) : ''}</span><button type="button" class="pn-del${pnSure === o.id ? ' sure' : ''}" data-pndel="${o.id}">${pnSure === o.id ? pt('sure') : pt('del')}</button></div>
     </article>`; }).join('') : `<p class="pn-empty">${pt('none')}</p>`;
@@ -2028,7 +2034,22 @@ async function pnRender(){
 }
 function pnToast(msg){ const t = document.getElementById('pnToast'); t.textContent = msg; t.hidden = false; clearTimeout(pnToast.t); pnToast.t = setTimeout(() => t.hidden = true, 2600); try { const a = new (window.AudioContext || window.webkitAudioContext)(); const o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; g.gain.value = .08; o.connect(g).connect(a.destination); o.start(); o.stop(a.currentTime + .18); } catch (e) {} }
 function pnPaintTop(){ document.getElementById('pnTheme').textContent = document.documentElement.dataset.theme === 'light' ? '🌙' : '☀️'; document.getElementById('pnLang').textContent = lang === 'ar' ? 'FR' : 'ع'; }
-function openPanel(c){ PanelStore.setPin(c); pnKnown = new Set(); pnPaidSeen = new Set(); try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch (e) {} const pnEl = document.getElementById('pn'); pnEl.dataset.role = 'admin'; if (LIVE) PanelStore.call('panel_whoami', {}).then(r => { pnEl.dataset.role = r === 'staff' ? 'staff' : 'admin'; }).catch(() => {}); document.getElementById('pn').hidden = false; document.body.classList.add('pn-open'); pnPaintTop(); pnRender(); clearInterval(pnTimer); pnTimer = setInterval(pnRender, LIVE ? 20000 : 4000); }
+const pnDhdSt = st => { st = String(st || ''); const fr = lang === 'fr';
+  if (/^retour/.test(st)) return ['↩️', fr ? 'Retour' : 'مرتجع', '#ef4444'];
+  if (/^(livre|encaiss|paye|paiement)/.test(st)) return ['✅', fr ? 'Livré' : 'تم التوصيل', '#16a34a'];
+  if (/livraison/.test(st)) return ['🛵', fr ? 'En livraison' : 'في التوصيل', '#2563eb'];
+  if (/suspend/.test(st)) return ['⏸️', fr ? 'Suspendu' : 'معلّق', '#f59e0b'];
+  if (/station|wilaya|prepar|transit/.test(st)) return ['🚚', fr ? 'En route' : 'في الطريق', '#2563eb'];
+  return ['📦', fr ? 'Prêt chez DHD' : 'جاهز عند DHD', '#7c3aed']; };
+let pnDhdSure = '', pnDhdBusy = '', pnDhdErr = {};
+function pnDhdBox(o){
+  if (o.dhd) { const [i, l, c] = pnDhdSt(o.dhd_status); return `<p class="pn-dhd" style="--c:${c}">${i} DHD · <b>${l}</b> · <span class="num">${pnEsc(o.dhd)}</span></p>`; }
+  if (o.status === 'delivered' || o.status === 'cancelled' || !o.items.some(x => !/^promax/.test(x.key || ''))) return '';
+  const fr = lang === 'fr';
+  return `<button type="button" class="pn-dhdgo${pnDhdSure === o.id ? ' sure' : ''}" data-pndhd="${o.id}"${pnDhdBusy === o.id ? ' disabled' : ''}>${pnDhdBusy === o.id ? '⏳ …' : pnDhdSure === o.id ? (fr ? '✅ Oui, créer le colis chez DHD' : '✅ نعم، أرسل الطرد لـ DHD') : (fr ? '📦 Envoyer à DHD' : '📦 أرسل لـ DHD')}</button>${pnDhdErr[o.id] ? `<p class="pn-dhd" style="--c:#ef4444">⚠️ DHD : ${pnEsc(pnDhdErr[o.id])}</p>` : ''}`;
+}
+function pnDhdSync(){ if (!LIVE) return; PanelStore.ops('dhd_sync', {}).then(r => { if (r && r.changed) PanelStore.all().then(pnRender); }).catch(() => {}); }
+function openPanel(c){ PanelStore.setPin(c); pnKnown = new Set(); pnPaidSeen = new Set(); try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch (e) {} const pnEl = document.getElementById('pn'); pnEl.dataset.role = 'admin'; if (LIVE) PanelStore.call('panel_whoami', {}).then(r => { pnEl.dataset.role = r === 'staff' ? 'staff' : 'admin'; }).catch(() => {}); document.getElementById('pn').hidden = false; document.body.classList.add('pn-open'); pnPaintTop(); pnRender(); clearInterval(pnTimer); pnTimer = setInterval(pnRender, LIVE ? 20000 : 4000); pnDhdSync(); clearInterval(window.pnDhdT); window.pnDhdT = setInterval(pnDhdSync, 600000); }
 function closePanel(){ document.getElementById('pn').hidden = true; document.body.classList.remove('pn-open'); clearInterval(pnTimer); }
 function pnExport(){
   PanelStore.all().then(all => {
@@ -2047,6 +2068,12 @@ document.getElementById('pn').addEventListener('click', async e => {
   if (b.dataset.pnf) { pnFilter = b.dataset.pnf; return pnRender(); }
   if (b.dataset.pns) { await PanelStore.setStatus(b.dataset.id, b.dataset.pns); return pnRender(); }
   if (b.dataset.pncopy) { try { await navigator.clipboard.writeText(b.dataset.pncopy); } catch (err) {} b.textContent = pt('copied'); return; }
+  if (b.dataset.pndhd) { const id = b.dataset.pndhd; delete pnDhdErr[id];
+    if (pnDhdSure !== id) { pnDhdSure = id; return pnRender(); }
+    pnDhdSure = ''; pnDhdBusy = id; pnRender();
+    try { await PanelStore.ops('dhd_send', { id }); pnToast(lang === 'fr' ? '📦 Colis créé chez DHD' : '📦 تم إنشاء الطرد عند DHD'); }
+    catch (err) { pnDhdErr[id] = String(err.message || err).replace(/^DHD : /, '').slice(0, 300); }
+    pnDhdBusy = ''; await PanelStore.all(); return pnRender(); }
   if (b.dataset.pndel) { if (pnSure === b.dataset.pndel) { pnSure = ''; await PanelStore.remove(b.dataset.pndel); } else pnSure = b.dataset.pndel; return pnRender(); }
 });
 document.getElementById('pnSearch').addEventListener('input', e => { pnQuery = e.target.value; pnRender(); });
