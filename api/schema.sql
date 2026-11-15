@@ -1,0 +1,36 @@
+-- MyAtomDZ sur Hostinger (MySQL) — créé une fois par api/install.php
+CREATE TABLE IF NOT EXISTS site_catalog (
+  `key` VARCHAR(60) PRIMARY KEY, name VARCHAR(120) NOT NULL, price_da INT NOT NULL DEFAULT 0,
+  kind VARCHAR(20) NOT NULL DEFAULT 'device', sort_order INT NOT NULL DEFAULT 0, active TINYINT(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS site_catalog_eu (
+  `key` VARCHAR(60) PRIMARY KEY, slug VARCHAR(60), name VARCHAR(120) NOT NULL, price_eur INT NOT NULL DEFAULT 0,
+  descr VARCHAR(400) NOT NULL DEFAULT '', specs MEDIUMTEXT, inbox MEDIUMTEXT, imgs MEDIUMTEXT,
+  sort_order INT NOT NULL DEFAULT 0, active TINYINT(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS site_orders (
+  id CHAR(36) PRIMARY KEY, order_no VARCHAR(20) NOT NULL UNIQUE, created_at DATETIME(3) NOT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'new', status_changed_at DATETIME(3) NULL,
+  name VARCHAR(120) NOT NULL, phone VARCHAR(20) NOT NULL, phone2 VARCHAR(20) NULL, email VARCHAR(120) NULL,
+  wilaya VARCHAR(80) NOT NULL, commune VARCHAR(80) NULL, address VARCHAR(250) NULL, note VARCHAR(400) NULL,
+  items MEDIUMTEXT NOT NULL, ship_type VARCHAR(10) NULL, ship_fee INT NOT NULL DEFAULT 0, device VARCHAR(10) NULL,
+  renew TINYINT(1) NOT NULL DEFAULT 0, total_da INT NOT NULL, deleted TINYINT(1) NOT NULL DEFAULT 0,
+  currency VARCHAR(5) NOT NULL DEFAULT 'DA', sumup_id VARCHAR(80) NULL, sumup_url VARCHAR(400) NULL, paid_at DATETIME(3) NULL,
+  dhd_tracking VARCHAR(60) NULL, dhd_status VARCHAR(60) NULL,
+  KEY k_created (created_at), KEY k_phone (phone, created_at), KEY k_sumup (sumup_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS site_events (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY, at DATETIME NOT NULL,
+  visitor VARCHAR(40), event VARCHAR(20), item VARCHAR(40), source VARCHAR(40), device VARCHAR(10), lang VARCHAR(4)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS panel_settings (id INT PRIMARY KEY, code_hash VARCHAR(100) NOT NULL, staff_hash VARCHAR(100) NULL) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS panel_attempts (at DATETIME NOT NULL, ok TINYINT(1) NOT NULL, KEY k_at (at)) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS site_settings (k VARCHAR(40) PRIMARY KEY, val MEDIUMTEXT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS site_img (id CHAR(36) PRIMARY KEY, data MEDIUMTEXT NOT NULL, created_at DATETIME NOT NULL) ENGINE=InnoDB;
+-- clés privées (SumUp, Brevo, DHD) : jamais lisibles par le site
+CREATE TABLE IF NOT EXISTS site_secrets (k VARCHAR(40) PRIMARY KEY, val VARCHAR(600) NOT NULL) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS counters (name VARCHAR(30) PRIMARY KEY, val BIGINT NOT NULL) ENGINE=InnoDB;

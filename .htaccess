@@ -1,0 +1,14 @@
+# MyAtomDZ sur Hostinger : mêmes adresses qu'avant (Supabase) → serveur PHP
+Options -Indexes
+RewriteEngine On
+RewriteRule ^rest/v1/rpc/([a-z_]+)/?$ api/rpc.php?fn=$1 [QSA,L]
+RewriteRule ^rest/v1/([a-z_]+)/?$ api/rest.php?t=$1 [QSA,L]
+RewriteRule ^functions/v1/sumup-pay/?$ api/sumup.php [QSA,L]
+RewriteRule ^(supabase|\.git|\.github)(/|$) - [F,L]
+RewriteRule ^api/(lib\.php|schema\.sql)$ - [F,L]
+RewriteRule \.sql$ - [F,L]
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>

@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>ATOM Europe — Boîtiers Android TV 4K</title>
-<meta name="description" content="ATOM S3, S2, AX4, M10 et Mutant Inferno ProMax — boîtiers Android TV 4K / 8K livrés dans toute l'Europe. Paiement sécurisé SumUp.">
+<meta name="description" content="ATOM S3, S2, AX4, M10 et Mutant Inferno ProMax — boîtiers Android TV 4K / 8K livrés dans toute l'Europe. Paiement sécurisé.">
 <meta name="robots" content="noindex">
 <meta property="og:type" content="website"><meta property="og:site_name" content="ATOM"><meta property="og:title" content="ATOM Europe — Boîtiers Android TV 4K">
-<meta property="og:description" content="ATOM S3, S2, AX4, M10, Mutant Inferno ProMax — boîtiers Android TV, paiement sécurisé SumUp.">
+<meta property="og:description" content="ATOM S3, S2, AX4, M10, Mutant Inferno ProMax — boîtiers Android TV, paiement sécurisé.">
 <meta property="og:image" content="https://atomdz.com/og/og-eu.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#000212">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
@@ -72,7 +72,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}f
 <header class="hdr"><div class="logo">AT<i>✻</i>M</div><button class="ib" id="th" type="button" aria-label="Jour / nuit">☀️</button></header>
 <main class="wrap">
   <div class="home" id="home">
-  <section class="hero"><h1>Boîtiers <em>Android TV 4K</em></h1><p>Choisissez votre boîtier, remplissez le formulaire et payez en ligne par carte, en toute sécurité avec SumUp.</p></section>
+  <section class="hero"><h1>Boîtiers <em>Android TV 4K</em></h1><p>Choisissez votre boîtier, remplissez le formulaire et payez en ligne par carte.</p></section>
   <div class="show" id="show"></div>
   <h2 style="margin:20px 0 0">Choisissez votre boîtier</h2>
   <div class="grid" id="grid"></div>
@@ -95,7 +95,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}f
     <div class="sum"><div><span id="sl">—</span><span id="sp">—</span></div><div><span>Livraison <small class="tvac">2 à 3 jours</small></span><span id="ss">—</span></div><div class="tot"><span>Total <small class="tvac">TVA comprise</small></span><b id="st">—</b></div></div>
     <p class="err" id="err" hidden></p>
     <button class="go" id="go" type="submit">Commander et payer</button>
-    <p class="pay">🔒 Paiement sécurisé par carte bancaire sur la page SumUp. Tous les prix sont TVA comprise.</p>
+    <p class="pay">🔒 Payer en ligne : carte bancaire, Apple Pay ou Google Pay, paiement sécurisé. Tous les prix sont TVA comprise.</p>
   </form>
   <div class="box done" id="done" hidden></div>
   <section class="sug"><h2>Vous aimerez aussi</h2><div class="sg" id="sg"></div></section>
@@ -103,7 +103,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}f
 </main>
 <footer>© 2026 ATOM · <a href="https://instagram.com/islem_atom" target="_blank" rel="noopener">Développé par Islamatom</a></footer>
 <script>
-const CONFIG = { url: 'https://zgwdjbliabxablrianko.supabase.co', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpnd2RqYmxpYWJ4YWJscmlhbmtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxNjY0NjAsImV4cCI6MjEwOTc0MjQ2MH0.bc4ML01qc2pDTP9vzJ2yTDs-uYz6Q-lY8CuyADPQT-c' };
+const CONFIG = { url: 'https://brown-yak-780163.hostingersite.com', key: 'atomdz' };
 let SHIP = 9; // frais de livraison en € (réglés dans le panel 🛒)
 const WA = '32499374830';
 let PRODUCTS = [
@@ -190,9 +190,9 @@ $('f').addEventListener('submit', async e => {
       const pay = await payFn({ order_no: no, phone }).catch(() => null);
       if (pay && pay.url) { location.href = pay.url; return; }
     }
-    const msg = `Bonjour ATOM 🇪🇺\nCommande ${no}\n${qty} × ${p.name} — ${eurf(p.price * qty)}\n${v('name')} · ${v('city')}, ${v('country')}\nMerci de m'envoyer le lien de paiement SumUp.`;
+    const msg = `Bonjour ATOM 🇪🇺\nCommande ${no}\n${qty} × ${p.name} — ${eurf(p.price * qty)}\n${v('name')} · ${v('city')}, ${v('country')}\nMerci de m'envoyer le lien de paiement.`;
     f.hidden = true; const d = $('done'); d.hidden = false;
-    d.innerHTML = `<div class="big">✅</div><h2>Commande reçue !</h2><div class="no">${no}</div><p>On vous envoie le <b>lien de paiement SumUp</b> sur WhatsApp. Dès le paiement, votre boîtier part.</p><a class="wa" href="https://wa.me/${WA}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">💬 Recevoir le lien sur WhatsApp</a>`;
+    d.innerHTML = `<div class="big">✅</div><h2>Commande reçue !</h2><div class="no">${no}</div><p>On vous envoie le <b>lien de paiement</b> sur WhatsApp. Dès le paiement, votre boîtier part.</p><a class="wa" href="https://wa.me/${WA}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">💬 Recevoir le lien sur WhatsApp</a>`;
     d.scrollIntoView({ behavior:'smooth' });
   } catch (x) { err.textContent = 'Commande non envoyée. Vérifiez internet ou écrivez-nous sur WhatsApp.'; err.hidden = false; }
   btn.disabled = false; btn.textContent = 'Commander et payer';

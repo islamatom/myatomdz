@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>Clés privées ATOM</title>
+<style>
+:root{--bg:#0d0f14;--card:#171a22;--tx:#eef0f5;--mu:#9aa1b2;--ac:#3b82f6;--ok:#22c55e;--bd:#2a2f3c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:16px}
+main{max-width:520px;margin:0 auto}h1{font-size:22px;margin:8px 0 4px}p{color:var(--mu);margin:0 0 14px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:0 0 12px}
+label{display:block;font-weight:600;margin:0 0 6px}small{color:var(--mu);display:block;margin:6px 0 0}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--bd);background:#0f1218;color:var(--tx);font-size:16px}
+button{width:100%;padding:13px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-weight:700;font-size:16px;margin-top:10px}
+.st{font-size:13px;font-weight:700;float:right}.st.y{color:var(--ok)}.st.n{color:#f59e0b}#msg{text-align:center;font-weight:700;min-height:22px}
+</style></head><body><main>
+<h1>🔑 Clés privées</h1>
+<p>Colle ici tes clés toi-même. Elles restent sur le serveur : personne ne peut les relire, même pas cette page.</p>
+<div class="c"><label for="code">Ton code du panel (patron)</label><input id="code" type="password" inputmode="numeric" autocomplete="off"><button id="go">Ouvrir</button></div>
+<div id="box" hidden></div>
+<div id="msg"></div>
+</main>
+<script>
+const F = [
+  ['sumup_key', 'Clé API SumUp', 'SumUp → Développeurs → Clés API → ta clé « atom » (commence par sup_sk_).'],
+  ['sumup_merchant', 'Code marchand SumUp', 'Déjà rempli (MVCUZT9H).'],
+  ['brevo_key', 'Clé API Brevo', 'Brevo → SMTP & API → Clés API (commence par xkeysib-).'],
+  ['brevo_sender', 'Adresse d’envoi Brevo', 'Une adresse validée dans Brevo → Expéditeurs.'],
+  ['notify_email', 'Ton e-mail (pour recevoir les commandes Europe)', ''],
+  ['dhd_token', 'Token DHD', 'DHD → API → ton token.'],
+];
+const $ = s => document.querySelector(s), msg = t => $('#msg').textContent = t;
+const rpc = (fn, b) => fetch('/rest/v1/rpc/' + fn, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) }).then(r => r.ok ? r.json() : Promise.reject(r.status));
+async function open_() {
+  const code = $('#code').value.trim();
+  let have; try { have = await rpc('panel_secrets_status', { p_code: code }); } catch (e) { have = false; }
+  if (!Array.isArray(have)) return msg('❌ Code faux');
+  msg('');
+  $('#box').hidden = false;
+  $('#box').innerHTML = F.map(([k, l, h]) => `<div class="c"><label for="${k}">${l}<span class="st ${have.includes(k) ? 'y">✅ remplie' : 'n">⚪ vide'}</span></label>
+    <input id="${k}" type="password" autocomplete="off" placeholder="${have.includes(k) ? 'Laisser vide = ne rien changer' : 'Colle ici'}">${h ? `<small>${h}</small>` : ''}</div>`).join('')
+    + '<button id="save">Enregistrer</button>';
+  $('#save').onclick = async () => {
+    let n = 0;
+    for (const [k] of F) { const v = $('#' + k).value.trim(); if (!v) continue; let ok = false; try { ok = await rpc('panel_set_secret', { p_code: code, p_name: k, p_val: v }); } catch (e) {} if (ok !== true) return msg('❌ Erreur sur ' + k); n++; }
+    msg(n ? `✅ ${n} clé(s) enregistrée(s)` : 'Rien à changer'); setTimeout(open_, 600);
+  };
+}
+$('#go').onclick = open_;
+$('#code').onkeydown = e => { if (e.key === 'Enter') open_(); };
+</script></body></html>
