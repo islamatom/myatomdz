@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS site_orders (
   items MEDIUMTEXT NOT NULL, ship_type VARCHAR(10) NULL, ship_fee INT NOT NULL DEFAULT 0, device VARCHAR(10) NULL,
   renew TINYINT(1) NOT NULL DEFAULT 0, total_da INT NOT NULL, deleted TINYINT(1) NOT NULL DEFAULT 0,
   currency VARCHAR(5) NOT NULL DEFAULT 'DA', sumup_id VARCHAR(80) NULL, sumup_url VARCHAR(400) NULL, paid_at DATETIME(3) NULL,
-  dhd_tracking VARCHAR(60) NULL, dhd_status VARCHAR(60) NULL,
+  dhd_tracking VARCHAR(60) NULL, dhd_status VARCHAR(60) NULL, mailed_at DATETIME(3) NULL,
   KEY k_created (created_at), KEY k_phone (phone, created_at), KEY k_sumup (sumup_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
