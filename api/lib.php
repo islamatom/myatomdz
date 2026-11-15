@@ -9,7 +9,8 @@ $CFG = require $cfgFile;
 function cors(): void {
   $o = $_SERVER['HTTP_ORIGIN'] ?? '';
   $ok = ['https://atomdz.com', 'https://www.atomdz.com', 'https://atom-gestion.pages.dev', 'https://brown-yak-780163.hostingersite.com', 'https://myatom.dz', 'https://www.myatom.dz'];
-  if (in_array($o, $ok, true)) { header("Access-Control-Allow-Origin: $o"); header('Vary: Origin'); }
+  // tout se fait avec le code du panel (pas de cookies) : on accepte toutes les origines (Gestion peut avoir son propre domaine)
+  header('Access-Control-Allow-Origin: ' . ($o !== '' ? $o : '*')); header('Vary: Origin');
   header('Access-Control-Allow-Headers: authorization, apikey, content-type, x-client-info, prefer');
   header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
   if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') { http_response_code(204); exit; }
