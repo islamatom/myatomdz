@@ -41,15 +41,19 @@ if ($act === 'dhd_send') {
   if (!$o || is_eu($o)) fail('not_found', 404);
   if ($o['dhd_tracking']) out(['tracking' => $o['dhd_tracking']]);
   $map = (array)(setting('dhd_map') ?? []);
-  $lines = array_values(array_filter(json_decode($o['items'], true) ?: [], fn($i) => !empty($map[$i['key'] ?? ''])));
-  if (!$lines) fail("Aucun produit de cette commande n'est relié au stock DHD (bouton 📦 Stock DHD).");
+  $all = json_decode($o['items'], true) ?: [];
+  $lines = array_values(array_filter($all, fn($i) => !empty($map[$i['key'] ?? ''])));
+  $other = array_values(array_filter($all, fn($i) => empty($map[$i['key'] ?? '']) && !str_starts_with((string)($i['key'] ?? ''), 'promax')));
+  if (!$lines && !$other) fail("Rien à livrer dans cette commande (abonnement seulement).");
   preg_match('/\d+/', (string)$o['wilaya'], $m); $wil = (int)($m[0] ?? 0);
   if ($wil < 1 || $wil > 58) fail('wilaya');
+  $txt = fn($arr) => implode(' + ', array_map(fn($i) => max(1, (int)$i['qty']) . ' ' . $i['name'], $arr));
   $p = ['reference' => $o['order_no'], 'nom_client' => $o['name'], 'telephone' => preg_replace('/\D/', '', $o['phone']),
     'adresse' => $o['address'] ?: ($o['commune'] ?: '-'), 'commune' => (string)$o['commune'], 'code_wilaya' => (string)$wil,
-    'montant' => (string)$o['total_da'], 'remarque' => mb_substr((string)$o['note'], 0, 250), 'type' => '1',
-    'stop_desk' => $o['ship_type'] === 'office' ? '1' : '0', 'stock' => '1',
-    'produit' => implode(',', array_map(fn($i) => $map[$i['key']], $lines)), 'quantite' => implode(',', array_map(fn($i) => (string)max(1, (int)$i['qty']), $lines))];
+    'montant' => (string)$o['total_da'], 'remarque' => mb_substr(trim(($other && $lines ? '+ ' . $txt($other) . ' · ' : '') . (string)$o['note']), 0, 250), 'type' => '1',
+    'stop_desk' => $o['ship_type'] === 'office' ? '1' : '0'];
+  if ($lines) { $p['stock'] = '1'; $p['produit'] = implode(',', array_map(fn($i) => $map[$i['key']], $lines)); $p['quantite'] = implode(',', array_map(fn($i) => (string)max(1, (int)$i['qty']), $lines)); }
+  else $p['produit'] = mb_substr($txt($other), 0, 250);
   if ($o['phone2']) $p['telephone_2'] = preg_replace('/\D/', '', $o['phone2']);
   [$ok, $c, $j] = dhd('/create/order?' . http_build_query($p), 'POST');
   $tr = $j['tracking'] ?? $j['data']['tracking'] ?? null;
