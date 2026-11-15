@@ -10,7 +10,7 @@ function order_json(array $o): array {
   return ['id' => $o['id'], 'no' => $o['order_no'], 'date' => iso($o['created_at']), 'status' => $o['status'], 'changed' => iso($o['status_changed_at']),
     'name' => $o['name'], 'phone' => $o['phone'], 'phone2' => $o['phone2'], 'wilaya' => $o['wilaya'], 'commune' => $o['commune'], 'address' => $o['address'],
     'note' => $o['note'], 'items' => json_decode($o['items'], true) ?: [], 'ship' => $o['ship_type'], 'fee' => (int)$o['ship_fee'], 'device' => $o['device'],
-    'renew' => (bool)$o['renew'], 'total' => (int)$o['total_da'], 'cur' => $o['currency'], 'email' => $o['email'], 'paid' => iso($o['paid_at']),
+    'renew' => (bool)$o['renew'], 'total' => (int)$o['total_da'], 'cur' => $o['currency'], 'email' => $o['email'], 'paid' => iso($o['paid_at']), 'mailed' => iso($o['mailed_at'] ?? null),
     'dhd' => $o['dhd_tracking'], 'dhd_status' => $o['dhd_status']];
 }
 function too_many(string $phone): bool {
@@ -64,7 +64,7 @@ switch ($fn) {
     if (!preg_match('/^\+?[0-9]{8,15}$/', $ph)) fail('phone');
     if (trim((string)($b['p_country'] ?? '')) === '' || trim((string)($b['p_address'] ?? '')) === '') fail('address');
     $email = trim((string)($b['p_email'] ?? ''));
-    $email = filter_var($email, FILTER_VALIDATE_EMAIL) ? cut($email, 120) : null;
+    $email = filter_var($email, FILTER_VALIDATE_EMAIL) ? cut($email, 120) : null;   // obligatoire dans le formulaire
     if (too_many($ph)) fail('too many orders');
     [$lines, $sub] = lines_from((array)($b['p_items'] ?? []), 'site_catalog_eu', 'price_eur');
     $sv = setting('eu_ship'); $fee = is_numeric($sv) ? max(0, (int)$sv) : 0;
@@ -94,6 +94,11 @@ switch ($fn) {
     $st = (string)($b['p_status'] ?? '');
     if (!in_array($st, ['new', 'confirmed', 'postponed', 'noanswer', 'cancelled', 'delivered'], true)) fail('status');
     q("UPDATE site_orders SET status = ?, status_changed_at = UTC_TIMESTAMP(3) WHERE id = ?", [$st, (string)($b['p_id'] ?? '')]);
+    // Europe payée marquée « Envoyée » → e-mail au client (une seule fois)
+    if ($st === 'delivered') {
+      $o = one("SELECT * FROM site_orders WHERE id = ?", [(string)($b['p_id'] ?? '')]);
+      if ($o && is_eu($o) && $o['paid_at'] && $o['email'] && !$o['mailed_at'] && mail_shipped($o)) q("UPDATE site_orders SET mailed_at = UTC_TIMESTAMP(3) WHERE id = ?", [$o['id']]);
+    }
     out(true);
   }
   case 'panel_set_fee': {
@@ -167,7 +172,7 @@ switch ($fn) {
   case 'panel_set_secret': {
     admin($b['p_code'] ?? '');
     $k = (string)($b['p_name'] ?? ''); $v = trim((string)($b['p_val'] ?? ''));
-    if (!in_array($k, ['sumup_key', 'sumup_merchant', 'brevo_key', 'brevo_sender', 'notify_email', 'dhd_token'], true) || strlen($v) > 600) fail('bad');
+    if (!in_array($k, ['sumup_key', 'sumup_merchant', 'brevo_key', 'brevo_sender', 'notify_email', 'dhd_token', 'smtp_user', 'smtp_pass'], true) || strlen($v) > 600) fail('bad');
     if ($v === '') q("DELETE FROM site_secrets WHERE k = ?", [$k]); else q("REPLACE INTO site_secrets (k, val) VALUES (?, ?)", [$k, $v]);
     out(true);
   }
