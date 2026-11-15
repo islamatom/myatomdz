@@ -560,6 +560,8 @@ html[data-theme="light"] .pn-st button{border-color:#0b13241a}
 .pn-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px;color:var(--muted);font-size:12px}
 .pn-dhd{margin:8px 0 0;padding:9px 11px;border-radius:12px;font-size:13px;font-weight:700;background:color-mix(in srgb,var(--c) 12%,transparent);color:var(--c);border:1px solid color-mix(in srgb,var(--c) 35%,transparent)}
 .pn-dhdgo{width:100%;margin:8px 0 0;padding:11px;border-radius:12px;border:1.5px dashed #7c3aed;background:color-mix(in srgb,#7c3aed 10%,transparent);color:#7c3aed;font-weight:800;font-size:14px}
+.pn-dhdv{border-color:#16a34a;color:#16a34a;background:color-mix(in srgb,#16a34a 10%,transparent)}
+.pn-dhdv.sure{background:#16a34a;border-color:#16a34a}
 .pn-dhdgo.sure{border-style:solid;background:#7c3aed;color:#fff}
 .pn-dhdgo:disabled{opacity:.6}
 .pn-del{border:0;background:none;color:var(--muted);font-weight:800;font-size:13px;padding:6px}
@@ -2043,6 +2045,8 @@ const pnDhdSt = st => { st = String(st || ''); const fr = lang === 'fr';
   return ['📦', fr ? 'Prêt chez DHD' : 'جاهز عند DHD', '#7c3aed']; };
 let pnDhdSure = '', pnDhdBusy = '', pnDhdErr = {};
 function pnDhdBox(o){
+  if (o.dhd && o.dhd_status === 'a_valider') { const fr = lang === 'fr', busy = pnDhdBusy === o.id, sure = pnDhdSure === 'v' + o.id;
+    return `<p class="pn-dhd" style="--c:#d97706">📝 DHD · <b>${fr ? 'Colis créé, envoi pas encore validé' : 'الطرد تخلق، الإرسال ما تأكدش'}</b> · <span class="num">${pnEsc(o.dhd)}</span></p><button type="button" class="pn-dhdgo pn-dhdv${sure ? ' sure' : ''}" data-pndhdv="${o.id}"${busy ? ' disabled' : ''}>${busy ? '⏳ …' : sure ? (fr ? '✅ Oui, valider l\'envoi' : '✅ نعم، أكّد الإرسال') : (fr ? '✅ Valider l\'envoi chez DHD' : '✅ أكّد الإرسال عند DHD')}</button>${pnDhdErr[o.id] ? `<p class="pn-dhd" style="--c:#ef4444">⚠️ DHD : ${pnEsc(pnDhdErr[o.id])}</p>` : ''}`; }
   if (o.dhd) { const [i, l, c] = pnDhdSt(o.dhd_status); return `<p class="pn-dhd" style="--c:${c}">${i} DHD · <b>${l}</b> · <span class="num">${pnEsc(o.dhd)}</span></p>`; }
   if (o.status === 'delivered' || o.status === 'cancelled' || !o.items.some(x => !/^promax/.test(x.key || ''))) return '';
   const fr = lang === 'fr';
@@ -2068,10 +2072,16 @@ document.getElementById('pn').addEventListener('click', async e => {
   if (b.dataset.pnf) { pnFilter = b.dataset.pnf; return pnRender(); }
   if (b.dataset.pns) { await PanelStore.setStatus(b.dataset.id, b.dataset.pns); return pnRender(); }
   if (b.dataset.pncopy) { try { await navigator.clipboard.writeText(b.dataset.pncopy); } catch (err) {} b.textContent = pt('copied'); return; }
+  if (b.dataset.pndhdv) { const id = b.dataset.pndhdv; delete pnDhdErr[id];
+    if (pnDhdSure !== 'v' + id) { pnDhdSure = 'v' + id; return pnRender(); }
+    pnDhdSure = ''; pnDhdBusy = id; pnRender();
+    try { await PanelStore.ops('dhd_valid', { id }); pnToast(lang === 'fr' ? '✅ Envoi validé chez DHD' : '✅ تأكّد الإرسال عند DHD'); }
+    catch (err) { pnDhdErr[id] = String(err.message || err).replace(/^DHD : /, '').slice(0, 300); }
+    pnDhdBusy = ''; await PanelStore.all(); return pnRender(); }
   if (b.dataset.pndhd) { const id = b.dataset.pndhd; delete pnDhdErr[id];
     if (pnDhdSure !== id) { pnDhdSure = id; return pnRender(); }
     pnDhdSure = ''; pnDhdBusy = id; pnRender();
-    try { await PanelStore.ops('dhd_send', { id }); pnToast(lang === 'fr' ? '📦 Colis créé chez DHD' : '📦 تم إنشاء الطرد عند DHD'); }
+    try { await PanelStore.ops('dhd_send', { id }); pnToast(lang === 'fr' ? '📦 Colis créé — valide l\'envoi' : '📦 الطرد تخلق — أكّد الإرسال'); }
     catch (err) { pnDhdErr[id] = String(err.message || err).replace(/^DHD : /, '').slice(0, 300); }
     pnDhdBusy = ''; await PanelStore.all(); return pnRender(); }
   if (b.dataset.pndel) { if (pnSure === b.dataset.pndel) { pnSure = ''; await PanelStore.remove(b.dataset.pndel); } else pnSure = b.dataset.pndel; return pnRender(); }

@@ -19,6 +19,12 @@ function dhd(string $path, string $method = 'GET'): array {
   $j = json_decode($t, true);
   return [$c >= 200 && $c < 300, $c, is_array($j) ? $j : ['raw' => mb_substr($t, 0, 300)]];
 }
+function dhd_valid(string $tr): bool {
+  [$ok, , $j] = dhd('/valid/order?' . http_build_query(['tracking' => $tr, 'ask_collection' => '0']), 'POST');
+  if ($ok && ($j['success'] ?? true) !== false) return true;
+  $GLOBALS['dhdValidErr'] = json_encode($j['message'] ?? $j['errors'] ?? $j, JSON_UNESCAPED_UNICODE);
+  return false;
+}
 $act = (string)($b['action'] ?? '');
 
 // ---------- stock chez DHD + liens produits du site ↔ produits DHD ----------
@@ -58,14 +64,23 @@ if ($act === 'dhd_send') {
   [$ok, $c, $j] = dhd('/create/order?' . http_build_query($p), 'POST');
   $tr = $j['tracking'] ?? $j['data']['tracking'] ?? null;
   if (!$ok || !$tr) fail('DHD : ' . json_encode($j['errors'] ?? $j['message'] ?? $j, JSON_UNESCAPED_UNICODE));
-  q("UPDATE site_orders SET dhd_tracking = ?, dhd_status = 'prete_a_expedier', status = IF(status = 'new', 'confirmed', status), status_changed_at = UTC_TIMESTAMP(3) WHERE id = ?", [$tr, $o['id']]);
+  // sur DHD, un colis créé doit être validé avant de partir : c'est Salima (ou le patron) qui valide ensuite (dhd_valid)
+  q("UPDATE site_orders SET dhd_tracking = ?, dhd_status = 'a_valider', status = IF(status = 'new', 'confirmed', status), status_changed_at = UTC_TIMESTAMP(3) WHERE id = ?", [$tr, $o['id']]);
   out(['tracking' => $tr]);
+}
+// ---------- valider l'envoi d'un colis créé (bouton « Valider l'envoi ») ----------
+if ($act === 'dhd_valid') {
+  $o = one("SELECT id, dhd_tracking FROM site_orders WHERE id = ? AND dhd_tracking IS NOT NULL", [(string)($b['id'] ?? '')]);
+  if (!$o) fail('not_found', 404);
+  if (!dhd_valid($o['dhd_tracking'])) fail('DHD : ' . ($GLOBALS['dhdValidErr'] ?? 'validation refusée'));
+  q("UPDATE site_orders SET dhd_status = 'prete_a_expedier' WHERE id = ?", [$o['id']]);
+  out(['ok' => true]);
 }
 
 // ---------- mettre à jour les statuts des colis ----------
 if ($act === 'dhd_sync') {
   $rows = q("SELECT id, dhd_tracking, dhd_status, status FROM site_orders WHERE dhd_tracking IS NOT NULL AND deleted = 0
-             AND COALESCE(dhd_status, '') NOT IN ('paye_et_archive', 'retour_archive', 'annule') LIMIT 300")->fetchAll();
+             AND COALESCE(dhd_status, '') NOT IN ('a_valider', 'paye_et_archive', 'retour_archive', 'annule') LIMIT 300")->fetchAll();
   $changed = 0;
   foreach (array_chunk($rows, 100) as $part) {
     [$ok, , $j] = dhd('/get/orders/status?' . http_build_query(['api_token' => $GLOBALS['TOKEN'], 'trackings' => implode(',', array_column($part, 'dhd_tracking')), 'status' => 'all']));
