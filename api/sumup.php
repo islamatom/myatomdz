@@ -17,15 +17,14 @@ function http(string $method, string $url, array $headers, ?string $body = null)
 function esc($s): string { return htmlspecialchars((string)($s ?? ''), ENT_QUOTES, 'UTF-8'); }
 // e-mail à Atom (Brevo) — ne bloque jamais le paiement
 function mail_atom(string $subject, array $o, string $extra = ''): void {
-  $bk = secret('brevo_key'); $to = secret('notify_email'); $from = secret('brevo_sender') ?: $to;
-  if (!$bk || !$to) return;
+  $to = secret('notify_email');
+  if (!$to) return;
   $items = implode('', array_map(fn($i) => '<li>' . (int)$i['qty'] . ' × ' . esc($i['name']) . ' — ' . (int)$i['price'] . ' €</li>', json_decode($o['items'], true) ?: []));
   $html = '<div style="font-family:Arial,sans-serif;font-size:15px;color:#111">' . $extra . '<h2 style="margin:0 0 8px">' . esc($o['order_no']) . ' · ' . esc($o['total_da']) . ' € TVA comprise</h2>'
     . '<p><b>' . esc($o['name']) . '</b> · ' . esc($o['phone']) . ($o['email'] ? ' · ' . esc($o['email']) : '') . '</p>'
     . '<p>📍 ' . esc(preg_replace('/^🇪🇺\s*/u', '', (string)$o['wilaya'])) . ' · ' . esc($o['commune']) . ' · ' . esc($o['address']) . '</p><ul>' . $items . '</ul>'
     . ($o['ship_fee'] ? '<p>Livraison : ' . esc($o['ship_fee']) . ' €</p>' : '') . '<p><a href="https://atomdz.com">Ouvrir le panel</a></p></div>';
-  http('POST', 'https://api.brevo.com/v3/smtp/email', ['api-key: ' . $bk, 'Content-Type: application/json', 'Accept: application/json'],
-    json_encode(['sender' => ['name' => 'ATOM Europe', 'email' => $from], 'to' => [['email' => $to]], 'subject' => $subject, 'htmlContent' => $html], JSON_UNESCAPED_UNICODE));
+  send_mail($to, 'Atom', $subject, $html);
 }
 // demande à SumUp l'état réel du paiement ; marque la commande payée si c'est le cas
 function sync(string $cid): bool {
@@ -36,6 +35,7 @@ function sync(string $cid): bool {
   if ($o && !$o['paid_at']) {
     $n = q("UPDATE site_orders SET paid_at = UTC_TIMESTAMP(3), status = IF(status = 'new', 'confirmed', status), status_changed_at = UTC_TIMESTAMP(3),
             note = LEFT(CONCAT('✅ PAYÉ en ligne · ', COALESCE(note, '')), 250) WHERE id = ? AND paid_at IS NULL", [$o['id']])->rowCount();
+    if ($n) { $o2 = one("SELECT * FROM site_orders WHERE id = ?", [$o['id']]); if ($o2 && $o2['email']) mail_paid($o2); }
     if ($n) mail_atom("✅ Payée — {$o['order_no']} · {$o['total_da']} € · {$o['name']}", $o, '<p style="font-size:18px;color:#167a4e"><b>✅ Paiement reçu</b> — tu peux préparer le colis.</p>');
   }
   return true;

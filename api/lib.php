@@ -61,7 +61,7 @@ function send_mail(string $to, string $toName, string $subject, string $html): b
   // 1) adresse pro Hostinger (ex. commande@atomdz.com) : SMTP
   $su = secret('smtp_user'); $sp = secret('smtp_pass');
   if ($su && $sp) return smtp_send($su, $sp, $to, $toName, $subject, $html);
-  $bk = secret('brevo_key'); $from = secret('brevo_sender') ?: 'commande@atomdz.com';
+  $bk = secret('brevo_key'); $from = secret('brevo_sender') ?: 'info@atomdz.com';
   if ($bk) {
     $ch = curl_init('https://api.brevo.com/v3/smtp/email');
     curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 15,
@@ -109,4 +109,20 @@ function smtp_send(string $user, string $pass, string $to, string $toName, strin
   }
   @fwrite($fp, "QUIT\r\n"); fclose($fp);
   return $okAll;
+}
+
+// e-mail au client Europe : « commande reçue et payée »
+function mail_paid(array $o): bool {
+  $items = implode('', array_map(fn($i) => '<li>' . (int)$i['qty'] . ' × ' . h($i['name']) . ' — ' . (int)$i['price'] . ' €</li>', json_decode($o['items'], true) ?: []));
+  $first = h(explode(' ', trim((string)$o['name']))[0]);
+  $html = '<div style="font-family:Arial,sans-serif;font-size:15px;color:#111;max-width:560px;margin:auto">'
+    . '<div style="background:#2c4fbf;color:#fff;padding:18px 20px;border-radius:14px 14px 0 0"><b style="font-size:20px">AT✻M</b></div>'
+    . '<div style="border:1px solid #e5e7eb;border-top:0;padding:20px;border-radius:0 0 14px 14px">'
+    . '<h2 style="margin:0 0 12px">✅ Merci, votre commande est confirmée !</h2><p>Bonjour ' . $first . ',</p>'
+    . '<p>Nous avons bien reçu votre paiement pour la commande <b>' . h($o['order_no']) . '</b>.</p><ul>' . $items . '</ul>'
+    . ($o['ship_fee'] ? '<p>Livraison : ' . (int)$o['ship_fee'] . ' €</p>' : '') . '<p><b>Total payé : ' . (int)$o['total_da'] . ' € TVA comprise</b></p>'
+    . '<p>Nous préparons votre colis. Vous recevrez un e-mail dès qu\'il part ; ensuite la livraison prend <b>2 à 3 jours</b>.</p>'
+    . '<p>Une question ? Répondez à cet e-mail ou écrivez-nous sur WhatsApp : <a href="https://wa.me/32499374830">+32 499 37 48 30</a></p>'
+    . '<p style="color:#666;font-size:13px">ATOM · atomdz.com/eu</p></div></div>';
+  return send_mail((string)$o['email'], (string)$o['name'], '✅ Commande ' . $o['order_no'] . ' confirmée — merci !', $html);
 }
