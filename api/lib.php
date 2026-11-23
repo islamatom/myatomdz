@@ -85,7 +85,9 @@ function mail_shipped(array $o): bool {
     . '<h2 style="margin:0 0 12px">📦 Votre colis est en route !</h2><p>Bonjour ' . $first . ',</p>'
     . '<p>Bonne nouvelle : votre commande <b>' . h($o['order_no']) . '</b> vient de partir. Vous la recevrez dans <b>2 à 3 jours</b>.</p>'
     . '<ul>' . $items . '</ul><p>Adresse de livraison : ' . h($o['address']) . ', ' . h($o['commune']) . ' (' . h(preg_replace('/^🇪🇺\s*/u', '', (string)$o['wilaya'])) . ')</p>'
-    . '<p>Une question ? Écrivez-nous sur WhatsApp : <a href="https://wa.me/32499374830">+32 499 37 48 30</a></p>'
+    . (!empty($o['mr_tracking']) ? '<p style="margin:16px 0"><a href="https://www.mondialrelay.be/fr-be/suivi-de-colis/?numeroExpedition=' . h($o['mr_tracking']) . '" style="background:#2c4fbf;color:#fff;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:bold">📍 Suivre mon colis (n° ' . h($o['mr_tracking']) . ')</a></p>' : '')
+    . (!empty($o['relay_txt']) ? '<p>📍 Point Relais : <b>' . h($o['relay_txt']) . '</b></p>' : '')
+    . '<p>Une question ? Écrivez-nous sur WhatsApp : <a href="https://wa.me/213540290775">+213 540 29 07 75</a></p>'
     . '<p style="color:#666;font-size:13px">Merci pour votre confiance — ATOM · atomdz.com/eu</p></div></div>';
   return send_mail((string)$o['email'], (string)$o['name'], '📦 Votre commande ' . $o['order_no'] . ' est en route', $html);
 }
@@ -122,7 +124,7 @@ function mail_paid(array $o): bool {
     . '<p>Nous avons bien reçu votre paiement pour la commande <b>' . h($o['order_no']) . '</b>.</p><ul>' . $items . '</ul>'
     . ($o['ship_fee'] ? '<p>Livraison : ' . (int)$o['ship_fee'] . ' €</p>' : '') . '<p><b>Total payé : ' . (int)$o['total_da'] . ' € TVA comprise</b></p>'
     . '<p>Nous préparons votre colis. Vous recevrez un e-mail dès qu\'il part ; ensuite la livraison prend <b>2 à 3 jours</b>.</p>'
-    . '<p>Une question ? Répondez à cet e-mail ou écrivez-nous sur WhatsApp : <a href="https://wa.me/32499374830">+32 499 37 48 30</a></p>'
+    . '<p>Une question ? Répondez à cet e-mail ou écrivez-nous sur WhatsApp : <a href="https://wa.me/213540290775">+213 540 29 07 75</a></p>'
     . '<p style="color:#666;font-size:13px">ATOM · atomdz.com/eu</p></div></div>';
   return send_mail((string)$o['email'], (string)$o['name'], '✅ Commande ' . $o['order_no'] . ' confirmée — merci !', $html);
 }

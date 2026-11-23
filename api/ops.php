@@ -27,6 +27,50 @@ function dhd_valid(string $tr): bool {
 }
 $act = (string)($b['action'] ?? '');
 
+// ---------- Europe : étiquette Mondial Relay (API Shipment 1.0) ----------
+if ($act === 'mr_label') {
+  $o = one("SELECT * FROM site_orders WHERE id = ? AND deleted = 0", [(string)($b['id'] ?? '')]);
+  if (!$o || !is_eu($o)) fail('not_found', 404);
+  if (!$o['paid_at']) fail("Commande pas encore payée : pas d'étiquette.");
+  if ($o['mr_tracking'] && $o['mr_label']) out(['tracking' => $o['mr_tracking'], 'label' => $o['mr_label']]);
+  if (!$o['relay_id']) fail("Pas de Point Relais choisi pour cette commande.");
+  $L = secret('mr_login'); $P = secret('mr_password'); $C = secret('mr_customer');
+  if (!$L || !$P || !$C) fail('Identifiants Mondial Relay manquants (page des clés).', 503);
+  $x = fn($v) => htmlspecialchars(trim((string)$v), ENT_XML1 | ENT_QUOTES, 'UTF-8');
+  $COUNTRY = ['Belgique'=>'BE','France'=>'FR','Pays-Bas'=>'NL','Luxembourg'=>'LU','Allemagne'=>'DE','Espagne'=>'ES','Italie'=>'IT','Portugal'=>'PT','Suisse'=>'CH','Autriche'=>'AT','Irlande'=>'IE','Danemark'=>'DK','Suède'=>'SE','Norvège'=>'NO','Finlande'=>'FI','Pologne'=>'PL','Tchéquie'=>'CZ','Grèce'=>'GR','Roumanie'=>'RO','Hongrie'=>'HU','Royaume-Uni'=>'GB'];
+  $cname = trim(preg_replace('/^🇪🇺\s*/u', '', (string)$o['wilaya']));
+  $cc = $COUNTRY[$cname] ?? substr((string)$o['relay_id'], 0, 2);
+  $addr = trim((string)$o['address']); $zip = ''; if (preg_match('/^(\S+)\s+(.*)$/u', $addr, $m) && preg_match('/\d/', $m[1])) { $zip = $m[1]; $addr = $m[2]; }
+  $parts = preg_split('/\s+/', trim((string)$o['name']), 2); $fn = $parts[0]; $ln = $parts[1] ?? $parts[0];
+  $items = json_decode($o['items'], true) ?: []; $n = array_sum(array_map(fn($i) => max(1, (int)$i['qty']), $items)) ?: 1;
+  $xml = '<?xml version="1.0" encoding="utf-8"?>'
+    . '<ShipmentCreationRequest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.example.org/Request">'
+    . '<Context><Login>' . $x($L) . '</Login><Password>' . $x($P) . '</Password><CustomerId>' . $x($C) . '</CustomerId><Culture>fr-FR</Culture><VersionAPI>1.0</VersionAPI></Context>'
+    . '<OutputOptions><OutputFormat>10x15</OutputFormat><OutputType>PdfUrl</OutputType></OutputOptions>'
+    . '<ShipmentsList><Shipment><OrderNo>' . $x($o['order_no']) . '</OrderNo><CustomerNo>' . $x(substr(preg_replace('/\D/', '', $o['phone']), -9)) . '</CustomerNo><ParcelCount>1</ParcelCount>'
+    . '<DeliveryMode Mode="24R" Location="' . $x($o['relay_id']) . '" /><CollectionMode Mode="REL" Location="" />'
+    . '<Parcels><Parcel><Content>' . $x('Boitier TV x' . $n) . '</Content><Weight Value="' . (700 * $n) . '" Unit="gr" /></Parcel></Parcels>'
+    . '<DeliveryInstruction></DeliveryInstruction>'
+    . '<Sender><Address><Title /><Firstname /><Lastname /><Streetname>Rue du Commerce</Streetname><HouseNo>9</HouseNo><CountryCode>BE</CountryCode><PostCode>5300</PostCode><City>Andenne</City>'
+    . '<AddressAdd1>ATOM</AddressAdd1><AddressAdd2 /><AddressAdd3 /><PhoneNo /><MobileNo>+213540290775</MobileNo><Email>' . $x(secret('smtp_user') ?: 'info@atomdz.com') . '</Email></Address></Sender>'
+    . '<Recipient><Address><Title /><Firstname>' . $x($fn) . '</Firstname><Lastname>' . $x($ln) . '</Lastname><Streetname>' . $x($addr ?: '-') . '</Streetname><HouseNo /><CountryCode>' . $x($cc) . '</CountryCode>'
+    . '<PostCode>' . $x($zip ?: '0000') . '</PostCode><City>' . $x($o['commune'] ?: '-') . '</City><AddressAdd1 /><AddressAdd2 /><AddressAdd3 /><PhoneNo /><MobileNo>' . $x($o['phone']) . '</MobileNo><Email>' . $x($o['email']) . '</Email></Address></Recipient>'
+    . '</Shipment></ShipmentsList></ShipmentCreationRequest>';
+  $ch = curl_init('https://connect-api.mondialrelay.com/api/Shipment');
+  curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 30, CURLOPT_POSTFIELDS => $xml,
+    CURLOPT_HTTPHEADER => ['Content-Type: text/xml', 'Accept: application/xml']]);
+  $res = (string)curl_exec($ch); $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
+  preg_match('/ShipmentNumber="([^"]+)"/', $res, $sn);
+  preg_match('#<Output>([^<]+)</Output>#', $res, $lab);
+  if (!$sn || !$lab) {
+    preg_match_all('/Message="([^"]+)"/', $res, $msgs);
+    fail('Mondial Relay : ' . ($msgs[1] ? implode(' · ', array_unique($msgs[1])) : ('réponse ' . $code . ' ' . mb_substr(strip_tags($res), 0, 200))));
+  }
+  $url = html_entity_decode($lab[1]);
+  q("UPDATE site_orders SET mr_tracking = ?, mr_label = ? WHERE id = ?", [$sn[1], $url, $o['id']]);
+  out(['tracking' => $sn[1], 'label' => $url]);
+}
+
 // ---------- créer le colis chez DHD (stock = 1 : DHD prend le produit dans ton stock) ----------
 if ($act === 'dhd_send') {
   $o = one("SELECT * FROM site_orders WHERE id = ? AND deleted = 0", [(string)($b['id'] ?? '')]);

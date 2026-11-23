@@ -66,6 +66,11 @@ button,a,input,select{touch-action:manipulation;font:inherit}input,select{font-s
 .dlv{margin:8px 0 0;padding:10px 12px;border-radius:12px;background:#00c8dc14;border:1px solid #00c8dc40;font-size:14px;color:var(--text)}.dlv b{color:var(--mint)}
 .sug h2{font-size:20px;margin:26px 0 10px}.sg{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}.sg .p{flex:0 0 44%;scroll-snap-align:start}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}footer a{color:var(--muted)}
+.mr .mr-help{margin:2px 0 8px;font-size:13px;opacity:.75;font-weight:400}
+.mr-btn{width:100%;padding:13px;border-radius:12px;border:1.5px dashed #2c4fbf;background:rgba(44,79,191,.08);color:#2c4fbf;font-weight:800;font-size:15px;cursor:pointer}
+.mr-chosen{margin:0 0 8px;padding:11px 12px;border-radius:12px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.4);font-size:14px;line-height:1.4}
+#Zone_Widget{margin-top:8px;border-radius:12px;overflow:hidden;color:#111;background:#fff}
+#Zone_Widget:empty{display:none}
 </style>
 </head>
 <body>
@@ -91,7 +96,13 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}f
     <label class="f"><span>E-mail (pour suivre votre colis)</span><input name="email" type="email" autocomplete="email" maxlength="80" required></label>
     <label class="f"><span>Pays <i>*</i></span><select name="country" id="country" required></select></label>
     <div class="two"><label class="f"><span>Code postal <i>*</i></span><input name="zip" autocomplete="postal-code" required maxlength="12"></label><label class="f"><span>Ville <i>*</i></span><input name="city" autocomplete="address-level2" required maxlength="60"></label></div>
-    <label class="f"><span>Adresse (rue et numéro) <i>*</i></span><input name="address" autocomplete="street-address" required maxlength="150"></label>
+    <label class="f"><span>Votre adresse (rue et numéro) <i>*</i></span><input name="address" autocomplete="street-address" required maxlength="150"></label>
+    <div class="f mr"><span>📍 Point Relais Mondial Relay <i>*</i></span>
+      <p class="mr-help">Votre colis arrive dans un Point Relais près de chez vous (magasin, tabac…). Vous le récupérez quand vous voulez.</p>
+      <div class="mr-chosen" id="mrChosen" hidden></div>
+      <button type="button" class="mr-btn" id="mrOpen">🗺️ Choisir mon Point Relais</button>
+      <div id="Zone_Widget"></div><input type="hidden" id="mrTarget">
+    </div>
     <div class="sum"><div><span id="sl">—</span><span id="sp">—</span></div><div><span>Livraison <small class="tvac">2 à 3 jours</small></span><span id="ss">—</span></div><div class="tot"><span>Total <small class="tvac">TVA comprise</small></span><b id="st">—</b></div></div>
     <p class="err" id="err" hidden></p>
     <button class="go" id="go" type="submit">Commander et payer</button>
@@ -105,7 +116,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 40px}f
 <script>
 const CONFIG = { url: 'https://brown-yak-780163.hostingersite.com', key: 'atomdz' };
 let SHIP = 9; // frais de livraison en € (réglés dans le panel 🛒)
-const WA = '32499374830';
+const WA = '213540290775';
 let PRODUCTS = [
   { key:'eu_s3', slug:'s3', name:'ATOM S3', price:99, imgs:['img/s3.jpg','img/s3-1.jpg','img/s3-2.jpg','img/s3-3.jpg'], desc:'3ᵉ génération · Android 14 · Wi-Fi 6 · BT 6.0',
     specs:['Processeur S905Y4 quatre cœurs (le plus récent)','Android 14','4K Ultra HD · HDR','Wi-Fi 6 · Bluetooth 6.0','HDMI'] },
@@ -172,16 +183,46 @@ document.addEventListener('click', e => {
   const q = e.target.closest('[data-q]'); if (q) { qty = Math.max(1, Math.min(10, qty + +q.dataset.q)); paint(); }
   if (e.target.closest('#th')) { const t = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'; document.documentElement.dataset.theme = t; try { localStorage.setItem('atom-theme', t); } catch (x) {} }
 });
+/* ---------- Point Relais Mondial Relay (carte officielle) ---------- */
+let relay = null, MR_BRAND = 'BDTEST  ', mrLoaded = null;
+const ISO = { 'Belgique':'BE','France':'FR','Pays-Bas':'NL','Luxembourg':'LU','Allemagne':'DE','Espagne':'ES','Italie':'IT','Portugal':'PT','Suisse':'CH','Autriche':'AT','Irlande':'IE','Danemark':'DK','Suède':'SE','Norvège':'NO','Finlande':'FI','Pologne':'PL','Tchéquie':'CZ','Grèce':'GR','Roumanie':'RO','Hongrie':'HU','Royaume-Uni':'GB' };
+const loadJs = src => new Promise((ok, ko) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ko; document.head.appendChild(s); });
+function mrLoad(){
+  if (!mrLoaded) {
+    const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(css);
+    mrLoaded = loadJs('https://code.jquery.com/jquery-3.7.1.min.js').then(() => loadJs('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js')).then(() => loadJs('https://widget.mondialrelay.com/parcelshop-picker/jquery.plugin.mondialrelay.parcelshoppicker.min.js'));
+  }
+  return mrLoaded;
+}
+$('mrOpen').addEventListener('click', async () => {
+  const f = $('f'), btn = $('mrOpen'), cc = ISO[f.country.value] || 'BE';
+  btn.disabled = true; btn.textContent = '⏳ Chargement de la carte…';
+  try {
+    await mrLoad();
+    $('Zone_Widget').innerHTML = '';
+    window.jQuery('#Zone_Widget').MR_ParcelShopPicker({
+      Target: '#mrTarget', Brand: MR_BRAND, Country: cc, PostCode: String(f.zip.value || '').trim(), AllowedCountries: cc,
+      ColLivMod: '24R', NbResults: '7', Responsive: true, ShowResultsOnMap: true,
+      OnParcelShopSelected: d => {
+        relay = { id: (d.Pays || cc) + '-' + d.ID, txt: [d.Nom, d.Adresse1, (d.CP || '') + ' ' + (d.Ville || '')].filter(Boolean).join(', ') };
+        const c = $('mrChosen'); c.hidden = false; c.innerHTML = '✅ <b>' + (d.Nom || '') + '</b><br>' + [d.Adresse1, (d.CP || '') + ' ' + (d.Ville || '')].filter(Boolean).join(', ');
+        $('mrOpen').textContent = '🔁 Changer de Point Relais';
+      }
+    });
+    btn.textContent = relay ? '🔁 Changer de Point Relais' : '👇 Choisissez sur la carte ou la liste';
+  } catch (x) { btn.textContent = '🗺️ Réessayer'; }
+  btn.disabled = false;
+});
 $('f').addEventListener('submit', async e => {
   e.preventDefault(); const f = e.target, err = $('err'); err.hidden = true;
   const v = k => String(f[k].value || '').trim(); const phone = v('phone').replace(/[^\d+]/g, '');
-  const bad = v('name').length < 2 ? 'Écrivez votre nom complet.' : !/^\+?\d{8,15}$/.test(phone) ? 'Numéro de téléphone invalide (ex. +32 470 12 34 56).' : !v('zip') || !v('city') || !v('address') ? 'Complétez votre adresse.' : '';
+  const bad = v('name').length < 2 ? 'Écrivez votre nom complet.' : !/^\+?\d{8,15}$/.test(phone) ? 'Numéro de téléphone invalide (ex. +32 470 12 34 56).' : !v('zip') || !v('city') || !v('address') ? 'Complétez votre adresse.' : !relay ? 'Choisissez votre Point Relais Mondial Relay.' : '';
   if (bad) { err.textContent = bad; err.hidden = false; return; }
   const p = PRODUCTS.find(x => x.key === sel); const btn = $('go'); btn.disabled = true; btn.textContent = 'Envoi…';
   try {
     let no = 'EU-TEST';
     if (/^https?:$/.test(location.protocol) && !CONFIG.key.startsWith('__')) {
-      const r = await fetch(`${CONFIG.url}/rest/v1/rpc/submit_eu_order`, { method:'POST', headers:{ 'Content-Type':'application/json', apikey: CONFIG.key, Authorization:`Bearer ${CONFIG.key}` }, body: JSON.stringify({ p_name: v('name'), p_phone: phone, p_country: v('country'), p_city: v('city'), p_zip: v('zip'), p_address: v('address'), p_items: [{ key: sel, qty }], p_ship: SHIP || 0, p_email: v('email') || null }) });
+      const r = await fetch(`${CONFIG.url}/rest/v1/rpc/submit_eu_order`, { method:'POST', headers:{ 'Content-Type':'application/json', apikey: CONFIG.key, Authorization:`Bearer ${CONFIG.key}` }, body: JSON.stringify({ p_name: v('name'), p_phone: phone, p_country: v('country'), p_city: v('city'), p_zip: v('zip'), p_address: v('address'), p_relay_id: relay ? relay.id : '', p_relay: relay ? relay.txt : '', p_items: [{ key: sel, qty }], p_ship: SHIP || 0, p_email: v('email') || null }) });
       if (!r.ok) throw new Error(); no = (await r.json()).order_no;
     }
     // paiement en ligne SumUp : le client part directement sur la page de paiement
@@ -224,7 +265,8 @@ async function payFn(body){
   try {
     const [rows, set] = await Promise.all([
       fetch(U + 'site_catalog_eu?select=key,slug,name,price_eur,descr,specs,inbox,imgs&active=eq.true&order=sort_order', { headers: H }).then(r => r.ok ? r.json() : Promise.reject()),
-      fetch(U + 'site_settings?select=val&key=eq.eu_ship', { headers: H }).then(r => r.ok ? r.json() : []).catch(() => [])
+      fetch(U + 'site_settings?select=val&key=eq.eu_ship', { headers: H }).then(r => r.ok ? r.json() : []).catch(() => []),
+      fetch(U + 'site_settings?select=val&key=eq.mr_brand', { headers: H }).then(r => r.ok ? r.json() : []).then(j => { if (j[0] && j[0].val) MR_BRAND = String(j[0].val); }).catch(() => [])
     ]);
     if (set[0] && typeof set[0].val === 'number') SHIP = set[0].val;
     if (!Array.isArray(rows) || !rows.length) { paint(); return; }

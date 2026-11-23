@@ -27,6 +27,9 @@ const F = [
   ['brevo_sender', 'Adresse d’envoi Brevo', 'Une adresse validée dans Brevo → Expéditeurs.'],
   ['notify_email', 'Ton e-mail (pour recevoir les commandes Europe)', ''],
   ['dhd_token', 'Token DHD', 'DHD → API → ton token.'],
+  ['mr_customer', 'Mondial Relay : Customer ID (code enseigne)', 'Ex. CC12ABCD — dans ton espace Mondial Relay Connect → API.'],
+  ['mr_login', 'Mondial Relay : Login API', 'Souvent une adresse du type …@business-api.mondialrelay.com'],
+  ['mr_password', 'Mondial Relay : mot de passe API', 'Le mot de passe de l’API (pas celui de ton espace client si ils sont différents).'],
 ];
 const $ = s => document.querySelector(s), msg = t => $('#msg').textContent = t;
 const rpc = (fn, b) => fetch('/rest/v1/rpc/' + fn, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) }).then(r => r.ok ? r.json() : Promise.reject(r.status));

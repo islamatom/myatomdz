@@ -6,7 +6,7 @@ $t = (string)($_GET['t'] ?? '');
 $allowed = [
   'site_catalog'    => ['cols' => ['key', 'name', 'price_da', 'kind', 'sort_order'], 'where' => 'active = 1', 'json' => []],
   'site_catalog_eu' => ['cols' => ['key', 'slug', 'name', 'price_eur', 'descr', 'specs', 'inbox', 'imgs', 'sort_order'], 'where' => 'active = 1', 'json' => ['specs', 'inbox', 'imgs']],
-  'site_settings'   => ['cols' => ['key', 'val'], 'where' => "k IN ('eu_ship')", 'json' => ['val']],
+  'site_settings'   => ['cols' => ['key', 'val'], 'where' => "k IN ('eu_ship', 'mr_brand')", 'json' => ['val']],
   'site_img'        => ['cols' => ['id', 'data'], 'where' => '1', 'json' => []],
 ];
 if (!isset($allowed[$t])) fail('not found', 404);

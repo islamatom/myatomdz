@@ -11,7 +11,8 @@ function order_json(array $o): array {
     'name' => $o['name'], 'phone' => $o['phone'], 'phone2' => $o['phone2'], 'wilaya' => $o['wilaya'], 'commune' => $o['commune'], 'address' => $o['address'],
     'note' => $o['note'], 'items' => json_decode($o['items'], true) ?: [], 'ship' => $o['ship_type'], 'fee' => (int)$o['ship_fee'], 'device' => $o['device'],
     'renew' => (bool)$o['renew'], 'total' => (int)$o['total_da'], 'cur' => $o['currency'], 'email' => $o['email'], 'paid' => iso($o['paid_at']), 'mailed' => iso($o['mailed_at'] ?? null),
-    'dhd' => $o['dhd_tracking'], 'dhd_status' => $o['dhd_status']];
+    'dhd' => $o['dhd_tracking'], 'dhd_status' => $o['dhd_status'],
+    'relay_id' => $o['relay_id'] ?? null, 'relay' => $o['relay_txt'] ?? null, 'mr' => $o['mr_tracking'] ?? null, 'mr_label' => $o['mr_label'] ?? null];
 }
 function too_many(string $phone): bool {
   return (int) one("SELECT COUNT(*) c FROM site_orders WHERE phone = ? AND created_at > (UTC_TIMESTAMP() - INTERVAL 1 HOUR)", [$phone])['c'] >= 3;
@@ -68,7 +69,11 @@ switch ($fn) {
     if (too_many($ph)) fail('too many orders');
     [$lines, $sub] = lines_from((array)($b['p_items'] ?? []), 'site_catalog_eu', 'price_eur');
     $sv = setting('eu_ship'); $fee = is_numeric($sv) ? max(0, (int)$sv) : 0;
-    $o = insert_order(['name' => $name, 'phone' => mb_substr($ph, 0, 16), 'email' => $email, 'wilaya' => '🇪🇺 ' . cut($b['p_country'], 40),
+    $rid = strtoupper(trim((string)($b['p_relay_id'] ?? '')));
+    if ($rid !== '' && !preg_match('/^[A-Z]{2}-[0-9A-Z]{1,10}$/', $rid)) fail('relay');   // obligatoire dans le formulaire
+    if ($rid === '') $rid = null;
+    $o = insert_order(['relay_id' => $rid, 'relay_txt' => cut($b['p_relay'] ?? '', 200),
+      'name' => $name, 'phone' => mb_substr($ph, 0, 16), 'email' => $email, 'wilaya' => '🇪🇺 ' . cut($b['p_country'], 40),
       'commune' => cut($b['p_city'] ?? '', 60), 'address' => cut(trim(($b['p_zip'] ?? '') . ' ' . $b['p_address']), 200),
       'note' => '💳 Paiement en ligne' . ($email ? ' · ' . $email : ''), 'items' => json_encode($lines, JSON_UNESCAPED_UNICODE),
       'ship_type' => 'home', 'ship_fee' => $fee, 'total_da' => $sub + $fee, 'currency' => 'EUR']);
@@ -172,8 +177,10 @@ switch ($fn) {
   case 'panel_set_secret': {
     admin($b['p_code'] ?? '');
     $k = (string)($b['p_name'] ?? ''); $v = trim((string)($b['p_val'] ?? ''));
-    if (!in_array($k, ['sumup_key', 'sumup_merchant', 'brevo_key', 'brevo_sender', 'notify_email', 'dhd_token', 'smtp_user', 'smtp_pass'], true) || strlen($v) > 600) fail('bad');
+    if (!in_array($k, ['sumup_key', 'sumup_merchant', 'brevo_key', 'brevo_sender', 'notify_email', 'dhd_token', 'smtp_user', 'smtp_pass', 'mr_login', 'mr_password', 'mr_customer'], true) || strlen($v) > 600) fail('bad');
     if ($v === '') q("DELETE FROM site_secrets WHERE k = ?", [$k]); else q("REPLACE INTO site_secrets (k, val) VALUES (?, ?)", [$k, $v]);
+    // le code enseigne Mondial Relay sert aussi à la carte des Points Relais du site (pas secret)
+    if ($k === 'mr_customer' && $v !== '') q("REPLACE INTO site_settings (k, val) VALUES ('mr_brand', ?)", [json_encode($v)]);
     out(true);
   }
   case 'panel_secrets_status': {   // dit seulement quelles clés sont remplies, jamais leur valeur
