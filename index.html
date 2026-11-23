@@ -742,6 +742,22 @@ html:not([data-theme="light"]) .light .pcard,html:not([data-theme="light"]) .lig
 .co-foot .btn-main{width:100%;padding:18px;font-size:18px}
 .co-foot .assure{margin-top:12px}
 body.co-lock{overflow:hidden}
+body.rg-lock{overflow:hidden}
+#rg{position:fixed;inset:0;z-index:9990;background:rgba(5,10,20,.62);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;animation:rgIn .25s ease}
+#rg[hidden]{display:none}
+.rg-box{position:relative;width:100%;max-width:520px;max-height:88vh;overflow:auto;background:var(--card,#fff);color:var(--text,#111);border-radius:24px 24px 0 0;padding:22px 16px 26px;box-shadow:0 -10px 40px rgba(0,0,0,.35);animation:rgUp .35s cubic-bezier(.2,.9,.3,1.2)}
+@media(min-width:700px){#rg{align-items:center}.rg-box{border-radius:24px}}
+.rg-box h3{margin:30px 8px 4px;font-size:21px;text-align:center}.rg-box>p{margin:0 0 16px;text-align:center;color:var(--muted,#667);font-size:14px}
+.rg-x{position:absolute;top:12px;inset-inline-end:12px;width:34px;height:34px;border-radius:50%;border:0;background:rgba(127,127,127,.15);color:inherit;font-size:15px}
+.rg-back{position:absolute;top:14px;inset-inline-start:12px;border:0;background:none;color:var(--muted,#667);font-weight:700}
+.rg-c{width:100%;display:flex;align-items:center;gap:14px;margin:0 0 12px;padding:16px;border-radius:18px;border:2px solid rgba(127,127,127,.22);background:rgba(127,127,127,.06);color:inherit;text-align:start;font:inherit;cursor:pointer;transition:transform .15s,border-color .15s}
+.rg-c:active{transform:scale(.98)}.rg-c b{display:block;font-size:18px}.rg-c small{color:var(--muted,#667);font-size:13px}.rg-c em{margin-inline-start:auto;font-style:normal;font-size:24px;opacity:.5}
+.rg-c.sug{border-color:#22c55e;background:rgba(34,197,94,.08)}.rg-c.sug b::after{content:' ✓';color:#16a34a}
+.rg-ic{font-size:38px;line-height:1}
+.rg-flags{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rg-f{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 4px;border-radius:14px;border:1.5px solid rgba(127,127,127,.22);background:rgba(127,127,127,.06);color:inherit;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.rg-f span{font-size:30px;line-height:1}.rg-f.sug{border-color:#2c4fbf;background:rgba(44,79,191,.12);grid-column:span 3;flex-direction:row;justify-content:center;font-size:16px;gap:10px}
+@keyframes rgIn{from{opacity:0}}@keyframes rgUp{from{transform:translateY(40px);opacity:0}}
 body.co-lock .sticky-cta,body.co-lock .atmos{display:none!important}
 
 .atmos-acts button{font-weight:800;color:var(--text)}
@@ -1231,7 +1247,7 @@ html[data-theme="light"] .ce input,html[data-theme="light"] .ce textarea,html[da
     <a class="brand" href="#top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImJnIiB4MT0iOCIgeTE9IjYiIHgyPSI1NyIgeTI9IjU5IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHN0b3Agc3RvcC1jb2xvcj0iIzIzM2Q2OCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzExMWQzNCIvPjwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9Im9yYml0IiB4MT0iMTMiIHkxPSIxMyIgeDI9IjUyIiB5Mj0iNTIiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBzdG9wLWNvbG9yPSIjNzVlMmI2Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2JhMGZmIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iMTkiIGZpbGw9InVybCgjYmcpIi8+CiAgPGVsbGlwc2UgY3g9IjMyIiBjeT0iMzIiIHJ4PSIyMiIgcnk9IjkuNSIgc3Ryb2tlPSJ1cmwoI29yYml0KSIgc3Ryb2tlLXdpZHRoPSIzLjIiLz4KICA8ZWxsaXBzZSBjeD0iMzIiIGN5PSIzMiIgcng9IjIyIiByeT0iOS41IiBzdHJva2U9InVybCgjb3JiaXQpIiBzdHJva2Utd2lkdGg9IjMuMiIgdHJhbnNmb3JtPSJyb3RhdGUoNjAgMzIgMzIpIi8+CiAgPGVsbGlwc2UgY3g9IjMyIiBjeT0iMzIiIHJ4PSIyMiIgcnk9IjkuNSIgc3Ryb2tlPSJ1cmwoI29yYml0KSIgc3Ryb2tlLXdpZHRoPSIzLjIiIHRyYW5zZm9ybT0icm90YXRlKDEyMCAzMiAzMikiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSI0LjIiIGZpbGw9IiNmZmYiLz4KICA8Y2lyY2xlIGN4PSI1MSIgY3k9IjIxIiByPSIzLjQiIGZpbGw9IiNmZmJiNjgiLz4KPC9zdmc+Cg==" alt="" style="width:30px;height:30px"><div>ATOM</div></a>
     <span class="num">📱 0697 60 58 94 · 0699 08 08 07</span>
     <a class="dev-sign" href="https://instagram.com/islem_atom" target="_blank" rel="noopener">Développé par <b>Islamatom</b> · 📸 @islem_atom</a>
-    <span>© 2026 ATOM <span class="v-tag">v9.53</span></span>
+    <span>© 2026 ATOM <span class="v-tag">v9.56</span></span>
     <nav class="foot-links" id="footLinks"></nav>
   </div>
 </footer>
@@ -2408,8 +2424,41 @@ function renderPick(){
   const only = cart.size === 1 ? [...cart.keys()][0] : '';
   box.innerHTML = PICK.filter(([k]) => CATALOG.some(c => c.key === k)).map(([k, ic]) => `<button type="button" class="pick-item${k === only ? ' on' : ''}" data-pick="${k}"><span>${ic} ${k.startsWith('promax_') ? 'ATOM Pro Max 4K' : (NAMES[lang] || {})[k] || k}</span><b class="num">${fmt(priceOf(k))}${k.startsWith('promax_') ? ' ' + t('per_year') : ''}</b></button>`).join('');
 }
+/* ===== v9.56 : d'où commande le client ? Algérie ou Europe (avec le pays) ===== */
+const RG_EU = [['BE','Belgique'],['FR','France'],['DE','Allemagne'],['NL','Pays-Bas'],['ES','Espagne'],['IT','Italie'],['LU','Luxembourg'],['CH','Suisse'],['GB','Royaume-Uni'],['PT','Portugal'],['AT','Autriche'],['IE','Irlande'],['DK','Danemark'],['SE','Suède'],['NO','Norvège'],['FI','Finlande'],['PL','Pologne'],['CZ','Tchéquie'],['GR','Grèce'],['RO','Roumanie'],['HU','Hongrie']];
+const RG_TZ = { Brussels:'BE', Paris:'FR', Berlin:'DE', Amsterdam:'NL', Madrid:'ES', Rome:'IT', Luxembourg:'LU', Zurich:'CH', London:'GB', Lisbon:'PT', Vienna:'AT', Dublin:'IE', Copenhagen:'DK', Stockholm:'SE', Oslo:'NO', Helsinki:'FI', Warsaw:'PL', Prague:'CZ', Athens:'GR', Bucharest:'RO', Budapest:'HU' };
+const rgFlag = c => String.fromCodePoint(...[...c].map(x => 127397 + x.charCodeAt(0)));
+function rgGuess(){ try { const z = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; if (/Algiers|Africa\//.test(z)) return { dz: true }; const c = RG_TZ[z.split('/')[1]]; if (/^Europe\//.test(z)) return { eu: true, c }; } catch (e) {} return {}; }
+function rgOpen(step){
+  const g = rgGuess(), fr = lang === 'fr';
+  let el = document.getElementById('rg'); if (!el) { el = document.createElement('div'); el.id = 'rg'; document.body.appendChild(el); }
+  el.dir = fr ? 'ltr' : 'rtl';
+  const list = g.c ? [RG_EU.find(x => x[0] === g.c), ...RG_EU.filter(x => x[0] !== g.c)] : RG_EU;
+  el.innerHTML = step === 'eu'
+    ? `<div class="rg-box"><button type="button" class="rg-x" data-rg="close" aria-label="Fermer">✕</button><button type="button" class="rg-back" data-rg="back">${fr ? '← Retour' : '→ رجوع'}</button>
+       <h3>🇪🇺 ${fr ? 'Dans quel pays êtes-vous ?' : 'في أي بلد راك؟'}</h3><p>${fr ? 'Livraison en 2 à 3 jours · paiement par carte, Apple Pay ou Google Pay' : 'توصيل في 2 إلى 3 أيام · الدفع بالبطاقة'}</p>
+       <div class="rg-flags">${list.map(([c, n], i) => `<button type="button" class="rg-f${g.c && !i ? ' sug' : ''}" data-rgc="${n}"><span>${rgFlag(c)}</span>${n}</button>`).join('')}<button type="button" class="rg-f" data-rgc="Autre pays d'Europe"><span>🇪🇺</span>${fr ? 'Autre pays' : 'بلد آخر'}</button></div></div>`
+    : `<div class="rg-box"><button type="button" class="rg-x" data-rg="close" aria-label="Fermer">✕</button>
+       <h3>${fr ? 'Vous commandez d’où ?' : 'منين راك تطلب؟'}</h3><p>${fr ? 'Choisissez pour voir les bons prix et la bonne livraison.' : 'اختار باش تشوف السعر والتوصيل المناسب.'}</p>
+       <button type="button" class="rg-c${g.dz ? ' sug' : ''}" data-rg="dz"><span class="rg-ic">🇩🇿</span><span><b>${fr ? 'Algérie' : 'الجزائر'}</b><small>${fr ? 'Prix en DA · paiement à la livraison · 58 wilayas' : 'السعر بالدينار · الدفع عند الاستلام · 58 ولاية'}</small></span><em>›</em></button>
+       <button type="button" class="rg-c${g.eu ? ' sug' : ''}" data-rg="eu"><span class="rg-ic">🇪🇺</span><span><b>${fr ? 'Europe' : 'أوروبا'}</b><small>${fr ? 'Prix en € · paiement par carte · Belgique, France, Allemagne…' : 'السعر باليورو · الدفع بالبطاقة · بلجيكا، فرنسا، ألمانيا…'}</small></span><em>›</em></button></div>`;
+  el.hidden = false; document.body.classList.add('rg-lock');
+}
+function rgClose(){ const el = document.getElementById('rg'); if (el) el.hidden = true; document.body.classList.remove('rg-lock'); }
+document.addEventListener('click', e => {
+  const eu = e.target.closest('a.eu-link'); if (eu) { e.preventDefault(); return rgOpen('eu'); }
+  const b = e.target.closest('[data-rg],[data-rgc]'); if (!b) { if (e.target.id === 'rg') rgClose(); return; }
+  if (b.dataset.rgc) { location.href = 'eu/?pays=' + encodeURIComponent(b.dataset.rgc); return; }
+  const k = b.dataset.rg;
+  if (k === 'close') return rgClose();
+  if (k === 'back') return rgOpen();
+  if (k === 'eu') return rgOpen('eu');
+  if (k === 'dz') { try { localStorage.setItem('atom-region', 'dz'); } catch (err) {} rgClose(); openCheckout(); }
+});
 function openCheckout(){
   if (!cart.size) { document.getElementById('commande').scrollIntoView({ behavior: 'smooth' }); return; }
+  let rg = ''; try { rg = localStorage.getItem('atom-region') || ''; } catch (e) {}
+  if (rg !== 'dz') return rgOpen();
   const o = document.querySelector('#commande .order'); if (o.classList.contains('co-open')) return;
   o.classList.add('co-open'); document.body.classList.add('co-lock'); o.scrollTop = 0;
   try { history.pushState({ co: 1 }, ''); } catch (e) {}

@@ -127,6 +127,7 @@ let sel = 'eu_s3', qty = 1;
 const eurf = n => new Intl.NumberFormat('fr-BE', { style:'currency', currency:'EUR', maximumFractionDigits: n % 1 ? 2 : 0 }).format(n);
 const $ = id => document.getElementById(id);
 $('country').innerHTML = COUNTRIES.map(c => `<option>${c}</option>`).join('');
+try { const pays = new URLSearchParams(location.search).get('pays'); if (pays && COUNTRIES.includes(pays)) { $('country').value = pays; sessionStorage.setItem('atom-pays', pays); } else { const sp = sessionStorage.getItem('atom-pays'); if (sp && COUNTRIES.includes(sp)) $('country').value = sp; } } catch (err) {}
 const card = p => `<button type="button" class="p" data-k="${p.key}"><div class="im">${p.imgs[0] ? `<img src="${p.imgs[0]}" alt="${p.name}" loading="lazy">` : '📦'}</div><div class="b"><b>${p.name}</b><small>${p.desc}</small><span class="pr">${eurf(p.price)}</span><span class="tva">TVA comprise</span></div></button>`;
 let SI = 0, ST = 0;
 function show(){
